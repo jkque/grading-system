@@ -1,0 +1,17 @@
+// auth.js
+export const LOGOUT = 'LOGOUT'
+export const SAVE_TOKEN = 'SAVE_TOKEN'
+export const FETCH_USER = 'FETCH_USER'
+export const FETCH_USER_SUCCESS = 'FETCH_USER_SUCCESS'
+export const FETCH_USER_FAILURE = 'FETCH_USER_FAILURE'
+export const UPDATE_USER = 'UPDATE_USER'
+export const FETCH_USER_SCHOOL = 'FETCH_USER_SCHOOL'
+export const FETCH_USER_SCHOOL_SUCCESS = 'FETCH_USER_SCHOOL_SUCCESS'
+export const FETCH_USER_SCHOOL_FAILURE = 'FETCH_USER_SCHOOL_FAILURE'
+export const UPDATE_USER_SCHOOL = 'UPDATE_USER_SCHOOL'
+
+// lang.js
+export const SET_LOCALE = 'SET_LOCALE'
+
+//school.js
+
