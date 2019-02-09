@@ -29,25 +29,7 @@ if (mix.inProduction()) {
     'sweetalert2',
     'vuex-router-sync',
     '@fortawesome/vue-fontawesome',
-    '@fortawesome/fontawesome-svg-core',
-    '@coreui/coreui',
-    '@coreui/coreui-plugin-chartjs-custom-tooltips',
-    '@coreui/icons',
-    '@coreui/vue',
-    'bootstrap-vue',
-    'chart.js',
-    'core-js',
-    'css-vars-ponyfill',
-    'flag-icon-css',
-    'font-awesome',
-    'perfect-scrollbar',
-    'simple-line-icons',
-    'vue-chartjs',
-    'vue-perfect-scrollbar',
-    'vue-bootstrap-datetimepicker',
-    'vue-js-toggle-button',
-    'xlsx',
-    'file-saver'
+    '@fortawesome/fontawesome-svg-core'
   ])
 }
 
