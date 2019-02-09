@@ -17,9 +17,9 @@
         <template v-if="school">
           <b-nav-item class="d-md-down-none" :to="{ path: `school/${school.id}/calendar` }"><i class="icon-calendar"></i></b-nav-item>
         </template>
-        <b-nav-item class="d-md-down-none">
+        <!-- <b-nav-item class="d-md-down-none">
           <NotificationDropDown/>
-        </b-nav-item>
+        </b-nav-item> -->
         <DefaultHeaderDropdownAccnt/>
         <b-nav-item class="px-3 user-name d-md-down-none">{{ user.name }}</b-nav-item>
       </b-navbar-nav>

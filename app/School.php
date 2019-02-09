@@ -35,16 +35,16 @@ class School extends Model
 
     public function students()
     {
-        return $this->members()->where('role', 'student')->with('user','section');
+        return $this->members()->where('role', 'student')->with('user','section','gradeLevel');
     }
 
     public function teachers()
     {
-        return $this->members()->where('role', 'teacher')->with('user','section');
+        return $this->members()->where('role', 'teacher')->with('user','section','gradeLevel');
     }
 
     public function admins()
     {
-        return $this->members()->where('role', 'admin')->with('user');
+        return $this->members()->where('role', 'school_admin')->with('user');
     }
 }

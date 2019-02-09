@@ -45,7 +45,9 @@ if (mix.inProduction()) {
     'vue-chartjs',
     'vue-perfect-scrollbar',
     'vue-bootstrap-datetimepicker',
-    'vue-js-toggle-button'
+    'vue-js-toggle-button',
+    'xlsx',
+    'file-saver'
   ])
 }
 

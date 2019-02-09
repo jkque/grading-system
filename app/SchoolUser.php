@@ -12,7 +12,7 @@ class SchoolUser extends Model
      *
      * @var array
      */
-     protected $fillable = ['school_id','user_id','section_id','role','status'];
+     protected $fillable = ['school_id','user_id','section_id','role','status','grade_level_id'];
     /**
      * The attributes that should be cast to native types.
      *
@@ -36,5 +36,10 @@ class SchoolUser extends Model
     public function school()
     {
         return $this->belongsTo('App\School');
+    }
+
+    public function gradeLevel()
+    {
+        return $this->belongsTo('App\GradeLevel');
     }
 }

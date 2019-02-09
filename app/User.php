@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -39,7 +40,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $appends = [
-        'photo_url', 'name',
+        'photo_url', 'name','age'
     ];
 
     /**
@@ -99,8 +100,23 @@ class User extends Authenticatable implements JWTSubject
         return ucwords($this->first_name).' '.ucfirst($this->middle_name[0]).' '.ucfirst($this->last_name);
     }
 
+    /**
+     * Get the user's age.
+     *
+     * @return string
+     */
+    public function getAgeAttribute()
+    {
+        return Carbon::parse($this->birthdate)->age;
+    }
+
     public function schools()
     {
         return $this->hasMany('App\SchoolUser')->with('school');
+    }
+
+    public function advisedSection()
+    {
+        return $this->hasMany('App\Section');
     }
 }

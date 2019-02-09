@@ -31,6 +31,18 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('school/year/{school}/create', 'School\SchoolYearController@create');
     Route::delete('school/year/{schoolYear}/destroy', 'School\SchoolYearController@destroy');
 
+    Route::get('school/{school}/student/list', 'School\StudentController@list');
+    Route::post('school/{school}/student/create', 'School\StudentController@create');
+    Route::delete('school/{school}/student/{user}/destroy', 'School\StudentController@destroy');
+    Route::patch('school/{school}/student/{user}/update', 'School\StudentController@update');
+    Route::post('school/student/import', 'School\StudentController@import');
+
+    Route::get('school/{school}/teacher/list', 'School\TeacherController@list');
+    Route::post('school/{school}/teacher/create', 'School\TeacherController@create');
+    Route::delete('school/{school}/teacher/{user}/destroy', 'School\TeacherController@destroy');
+    Route::patch('school/{school}/teacher/{user}/update', 'School\TeacherController@update');
+    Route::post('school/teacher/import', 'School\TeacherController@import');
+
     Route::patch('school/grading-period/{gradingPeriod}/setStatus', 'School\GradingPeriodController@setStatus');
     Route::patch('school/grading-period/{gradingPeriod}/update', 'School\GradingPeriodController@update');
 

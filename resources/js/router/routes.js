@@ -15,6 +15,8 @@ const Dashboard = () => import('~/pages/dashboard').then(m => m.default || m)
 const schoolYear = () => import('~/pages/school/schoolYear').then(m => m.default || m)
 const gradingPeriod = () => import('~/pages/school/gradingPeriod').then(m => m.default || m)
 const schoolInfo = () => import('~/pages/school/info').then(m => m.default || m)
+const schoolStudents = () => import('~/pages/school/students').then(m => m.default || m)
+const schoolTeachers = () => import('~/pages/school/teachers').then(m => m.default || m)
 
 const gradeLevelList = () => import('~/pages/school/gradelevel/list').then(m => m.default || m)
 const SectionList = () => import('~/pages/school/gradelevel/section/list').then(m => m.default || m)
@@ -66,6 +68,8 @@ export default [
           { path: 'school-info', name: 'School Information', component: schoolInfo},
           { path: 'school-year', name: 'School Year', component: schoolYear},
           { path: 'grading-period', name: 'Grading Period', component: gradingPeriod },
+          { path: 'students', component: schoolStudents, meta: { label: 'Students'}, props: true },
+          { path: 'teachers', component: schoolTeachers, meta: { label: 'Teachers'}, props: true },
           { 
             path: 'grade-level', 
             redirect: 'grade-level',

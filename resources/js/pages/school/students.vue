@@ -2,9 +2,7 @@
 <b-col class="wrapper">
     <b-col class="animated fadeIn">
         <b-card no-header  v-show="!isShowAddUser && !isShowImportUser">
-            <template slot="header">
-                {{`${gradeLevel.name} / Students` }}
-            </template>
+            <template slot="header">Students</template>
             <b-col md="2">
                 <b-button variant="outline-primary" @click="showAddUser()"><i class="icon-plus"></i>&nbsp;Add</b-button>
                 <b-button variant="outline-primary" @click="showImportUser()"><i class="icon-arrow-up-circle"></i>&nbsp;Import</b-button>
@@ -19,6 +17,9 @@
                     </template>
                     <template slot="address" slot-scope="data">
                         {{ data.item.user.address }}
+                    </template>
+                    <template slot="gradeLevel" slot-scope="data">
+                        {{ data.item.grade_level ? data.item.grade_level.name : 'n/a' }}
                     </template>
                     <template slot="section" slot-scope="data">
                         {{ data.item.section ? data.item.section.name : 'n/a' }}

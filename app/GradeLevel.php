@@ -30,11 +30,11 @@ class GradeLevel extends Model
 
     public function students()
     {
-        return $this->hasMany('App\SchoolUser')->where('role', 'student')->with('user');
+        return $this->hasMany('App\SchoolUser')->where('role', 'student')->with('user','section');
     }
 
     public function teachers()
     {
-        return $this->hasMany('App\SchoolUser')->where('role', 'teacher')->with('user');
+        return $this->hasMany('App\SchoolUser')->where('role', 'teacher')->with('user','section');
     }
 }
