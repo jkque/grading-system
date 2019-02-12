@@ -29,7 +29,19 @@ if (mix.inProduction()) {
     'sweetalert2',
     'vuex-router-sync',
     '@fortawesome/vue-fontawesome',
-    '@fortawesome/fontawesome-svg-core'
+    'vue-bootstrap-datetimepicker',
+    'css-vars-ponyfill',
+    'chart.js',
+    'core-js',
+    'file-saver',
+    'laravel-echo',
+    'moment',
+    'pusher-js',
+    'vue-chartjs',
+    'vue-html-to-paper',
+    'vue-js-toggle-button',
+    'xlsx'
+
   ])
 }
 

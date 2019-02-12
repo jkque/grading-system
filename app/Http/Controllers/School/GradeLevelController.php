@@ -4,6 +4,7 @@ namespace App\Http\Controllers\School;
 
 use App\School;
 use App\GradeLevel;
+use App\Section;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -31,7 +32,12 @@ class GradeLevelController extends Controller
 
     public function view(GradeLevel $gradeLevel)
     {
-        return $gradeLevel;
+        return $gradeLevel->load('sections');
+    }
+
+    public function viewSection(Section $section)
+    {
+        return $section->load('adviser');
     }
 
 }

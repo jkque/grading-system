@@ -1,22 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\School;
+namespace App\Http\Controllers\School\GradeLevel\Section;
 
-use App\User;
+use App\GradeLevel;
+use App\Section;
 use App\School;
 use App\SchoolUser;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Jobs\HandleImportStudent;
 
 class StudentController extends Controller
 {
-    public function list(School $school)
+    public function list(Section $section)
     {
-        return $school->students;
+        return $section->students;
     }
 
-    public function create(Request $request, School $school)
+    public function create(Request $request, Section $section)
     {
         
         $data = $this->validate($request, [
@@ -38,14 +40,14 @@ class StudentController extends Controller
 
         
         SchoolUser::create([
-            'school_id' => $school->id,
+            'school_id' => $section->gradeLevel->school->id,
             'user_id' => $user->id,
             'role' => $request->role,
-            'grade_level_id' => $request->grade_level_id ?? null,
+            'grade_level_id' => $section->gradeLevel->id,
             'section_id' => $request->section_id ?? null
         ]);
 
-        return $school->students;
+        return $section->students;
     }
 
     /**
@@ -54,10 +56,10 @@ class StudentController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function destroy(School $school, User $user)
+    public function destroy(Section $section, User $user)
     {
-        SchoolUser::whereUserId($user->id)->whereSchoolId($school->id)->whereRole('student')->delete();
-        return $school->students;
+        SchoolUser::whereUserId($user->id)->whereSectionId($section->id)->whereRole('student')->delete();
+        return $section->students;
     }
 
     /**
@@ -66,8 +68,9 @@ class StudentController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, School $school,  User $user)
+    public function update(Request $request, Section $section,  User $user)
     {
+
         $data = $this->validate($request, [
             'first_name' => 'required',
             'last_name' => 'required',
@@ -76,15 +79,8 @@ class StudentController extends Controller
         ]);
         
         tap($user)->update($request->only('first_name','last_name','address','birthdate'));
-        
-        if($request->filled('grade_level_id')){
-            SchoolUser::whereUserId($user->id)->whereSchoolId($school->id)->whereRole('student')->update(['grade_level_id' => $request->grade_level_id]);
-        }
-
-        if($request->filled('section_id')){
-            SchoolUser::whereUserId($user->id)->whereSchoolId($school->id)->whereRole('student')->update(['section_id' => $request->section_id]);
-        }
-        return $school->students;
+        SchoolUser::whereUserId($user->id)->whereSectionId($section->id)->whereRole('student')->update(['section_id' => $request->section_id]);
+        return $section->students;
     }
 
     /**

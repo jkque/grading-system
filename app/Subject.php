@@ -22,4 +22,9 @@ class Subject extends Model
     {
         return $this->hasMany('App\SectionSubject')->with('section');
     }
+    
+    public function lessonPlan()
+    {
+        return $this->belongsTo('App\LessonPlan');
+    } 
 }

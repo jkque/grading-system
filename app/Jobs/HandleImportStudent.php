@@ -43,6 +43,7 @@ class HandleImportStudent implements ShouldQueue
                 'address' => $user['address'],
                 'birthdate' => Carbon::parse($user['birthdate'])->format('Y-m-d'),
             ]);
+            $u->assignRole('student');
             
             SchoolUser::create([
                 'school_id' => $school->id,

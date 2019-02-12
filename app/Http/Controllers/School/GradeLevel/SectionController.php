@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\School;
+namespace App\Http\Controllers\School\GradeLevel;
 
 use App\GradeLevel;
 use App\Section;
@@ -60,7 +60,7 @@ class SectionController extends Controller
         $this->validate($request, [
             'name' => 'required',
         ]);
-        tap($section)->update($request->only('name'));
-        return $section->gradeLevel->sections;
+        tap($section)->update($request->only('name','teacher_id'));
+        return $section->gradeLevel->sections->load('subjects','students','adviser');
     }
 }

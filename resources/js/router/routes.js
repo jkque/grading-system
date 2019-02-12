@@ -17,10 +17,20 @@ const gradingPeriod = () => import('~/pages/school/gradingPeriod').then(m => m.d
 const schoolInfo = () => import('~/pages/school/info').then(m => m.default || m)
 const schoolStudents = () => import('~/pages/school/students').then(m => m.default || m)
 const schoolTeachers = () => import('~/pages/school/teachers').then(m => m.default || m)
+const schoolCalenar = () => import('~/pages/school/calendar').then(m => m.default || m)
+
 
 const gradeLevelList = () => import('~/pages/school/gradelevel/list').then(m => m.default || m)
 const SectionList = () => import('~/pages/school/gradelevel/section/list').then(m => m.default || m)
 const gradeLevelSubject = () => import('~/pages/school/gradelevel/subjects').then(m => m.default || m)
+const gradeLevelStudents = () => import('~/pages/school/gradelevel/students').then(m => m.default || m)
+const gradeLevelTeachers = () => import('~/pages/school/gradelevel/teachers').then(m => m.default || m)
+
+const sectionStudents = () => import('~/pages/school/gradelevel/section/students').then(m => m.default || m)
+const sectionSubjects = () => import('~/pages/school/gradelevel/section/subjects').then(m => m.default || m)
+
+const teacherSections = () => import('~/pages/school/teacher/sections').then(m => m.default || m)
+const teacherLessonPlans = () => import('~/pages/school/teacher/lessonPlans').then(m => m.default || m)
 
 
 
@@ -70,11 +80,13 @@ export default [
           { path: 'grading-period', name: 'Grading Period', component: gradingPeriod },
           { path: 'students', component: schoolStudents, meta: { label: 'Students'}, props: true },
           { path: 'teachers', component: schoolTeachers, meta: { label: 'Teachers'}, props: true },
+          { path: 'calendar', component: schoolCalenar, meta: { label: 'Calendar'}, props: true },
           { 
             path: 'grade-level', 
             redirect: 'grade-level',
             name: 'Grade Level',
             meta: { label: 'Grade Level'} ,
+            props: true,
             component: {
               render (c) { return c('router-view') }
             },
@@ -83,19 +95,49 @@ export default [
               { 
                 path: ':grade_level_id', 
                 redirect: '/:grade_level_id/sections',
+                props: true,
                 component: {
                   render (c) { return c('router-view') }
                 },
                 children: [
-                  { path: '', component: SectionList },
-                  { path: 'sections', component: SectionList, meta: { label: 'Sections'}, props: true},     
-                  { path: 'subjects', component: gradeLevelSubject, meta: { label: 'Subjects'}, props: true},        
+                  { path: '', component: SectionList }, 
+                  { path: 'subjects', component: gradeLevelSubject, meta: { label: 'Subjects'}, props: true}, 
+                  { path: 'teachers', component: gradeLevelTeachers, meta: { label: 'Teachers'}, props: true },  
+                  { path: 'students', component: gradeLevelStudents, meta: { label: 'Students'}, props: true },     
+                  { 
+                    path: 'sections', 
+                    redirect: 'sections',
+                    // component: SectionList, 
+                    meta: { label: 'Sections'}, 
+                    props: true,
+                    component: {
+                      render (c) { return c('router-view') }
+                    },
+                    children: [
+                      { path: '', component: SectionList },
+                      { 
+                        path: ':section_id', 
+                        redirect: '/:section_id/students',
+                        props: true,
+                        component: {
+                          render (c) { return c('router-view') }
+                        },
+                        children: [
+                          { path: '', component: sectionStudents }, 
+                          { path: 'students', component: sectionStudents, meta: { label: 'Students'}, props: true}, 
+                          { path: 'subjects', component: sectionSubjects, meta: { label: 'Subjects'}, props: true },  
+                        ],
+                      },         
+                    ],
+                  }
                 ],
               },         
             ],
           },
         ],
-      }
+      },
+      { path: 'classes', component: teacherSections, meta: { label: 'Classes'}},
+      { path: 'lesson-plans', component: teacherLessonPlans, meta: { label: 'Lesson Plans'}},
     ]
   },
 

@@ -22,7 +22,7 @@ class Section extends Model
 
     public function adviser()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\User','user_id');
     }
 
     public function gradeLevel()

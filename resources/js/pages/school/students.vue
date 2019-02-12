@@ -3,7 +3,7 @@
     <b-col class="animated fadeIn">
         <b-card no-header  v-show="!isShowAddUser && !isShowImportUser">
             <template slot="header">Students</template>
-            <b-col md="2">
+            <b-col md="4">
                 <b-button variant="outline-primary" @click="showAddUser()"><i class="icon-plus"></i>&nbsp;Add</b-button>
                 <b-button variant="outline-primary" @click="showImportUser()"><i class="icon-arrow-up-circle"></i>&nbsp;Import</b-button>
             </b-col> 

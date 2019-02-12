@@ -50,6 +50,18 @@ export default {
           icon: 'icon-user',
           middleware: ['admin','school_admin']
         },
+        {
+          name: 'Classes',
+          url: `/classes`,
+          icon: 'icon-list',
+          middleware: ['teacher']
+        },
+        {
+          name: 'Lesson Plans',
+          url: `/lesson-plans`,
+          icon: 'icon-list',
+          middleware: ['teacher']
+        },
       ],
     }
   }

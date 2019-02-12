@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\School;
+namespace App\Http\Controllers\School\GradeLevel;
 
 use App\Subject;
 use App\GradeLevel;
+use App\SectionSubject;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -18,10 +19,17 @@ class SubjectController extends Controller
     {
 
         foreach ($request->inputs as $key => $value) {
-            $section = Subject::create([
+            $subject = Subject::create([
                 'grade_level_id' => $gradeLevel->id,
                 'name' => $request->inputs[$key]['name'],
             ]);
+            foreach ($gradeLevel->sections as $section) {
+                SectionSubject::create([
+                    'section_id' => $section->id,
+                    'subject_id' => $subject->id,
+                ]);
+                
+            }
         }
         return $gradeLevel->subjects;
         

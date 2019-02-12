@@ -5,7 +5,7 @@
             <template slot="header">
                 {{`${gradeLevel.name} / Students` }}
             </template>
-            <b-col md="2">
+            <b-col md="4">
                 <b-button variant="outline-primary" @click="showAddUser()"><i class="icon-plus"></i>&nbsp;Add</b-button>
                 <b-button variant="outline-primary" @click="showImportUser()"><i class="icon-arrow-up-circle"></i>&nbsp;Import</b-button>
             </b-col> 
@@ -73,18 +73,6 @@
                         <div class="col-md-7">
                         <datePicker name="birthdate" v-model="form.birthdate" :class="{ 'is-invalid': form.errors.has('birthdate') }" :config="datePickerOptions"></datePicker>
                         <has-error :form="form" field="birthdate"/>
-                        </div>
-                    </div>
-
-                    <!-- Grade Level -->
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label text-md-right">Grade Level</label>
-                        <div class="col-md-7">
-                            <b-form-select
-                                :options="gradeLevelSelect"
-                                v-model="form.grade_level_id"
-                                @change="handleGradeLevelChange()" >
-                            </b-form-select>
                         </div>
                     </div>
 
@@ -185,18 +173,6 @@
                 </div>
             </div>
 
-            <!-- Grade Level -->
-            <div class="form-group row">
-                <label class="col-md-3 col-form-label text-md-right">Grade Level</label>
-                <div class="col-md-7">
-                    <b-form-select
-                        :options="gradeLevelSelect"
-                        v-model="form.grade_level_id"
-                        @change="handleGradeLevelChange()" >
-                    </b-form-select>
-                </div>
-            </div>
-
             <!-- Section -->
             <div class="form-group row">
                 <label class="col-md-3 col-form-label text-md-right">Section</label>
@@ -232,13 +208,12 @@ import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
 import UploadExcelComponent from '~/components/UploadExcel'
 
 export default {
-    props: ['school_id'],
+    props: ['grade_level_id'],
     components: {
         datePicker,
         UploadExcelComponent 
     },
     middleware: 'auth',
-    name: 'schoolYear',
     data: function () {
         return {
             form: new Form({
@@ -273,10 +248,6 @@ export default {
                     sortable: true
                 },
                 {
-                    key: 'gradeLevel',
-                    sortable: true
-                },
-                {
                     key: 'section',
                     sortable: true
                 },
@@ -286,8 +257,8 @@ export default {
             ],
             modalInfoShow: false,
             list: [],
-            gradeLevels: [],
-            sectionSelect: [],
+            gradeLevel: {},
+            // sectionSelect: [],
             addCount: 5,
             inputs: [],
             isShowAddUser: false,
@@ -297,13 +268,21 @@ export default {
         }
     },
     computed: {
-        gradeLevelSelect: function () {
-            return this.gradeLevels.slice().map(obj =>{ 
-                var rObj = {};
-                rObj.text = obj.name;
-                rObj.value = obj.id;
-                return rObj;
-            });
+        sectionSelect: function () {
+            let vm = this
+            setTimeout(() => {
+                if(vm.gradeLevel.sections.length){
+                    return vm.gradeLevel.sections.slice().map(obj =>{ 
+                        var rObj = {};
+                        rObj.text = obj.name;
+                        rObj.value = obj.id;
+                        return rObj;
+                    });
+                }else{
+                    return [];
+                }
+                
+            }, 300);
         }
     },
     methods:{
@@ -317,38 +296,19 @@ export default {
             this.form.last_name = item.user.last_name;
             this.form.address = item.user.address;
             this.form.birthdate = moment(item.user.birthdate).format('YYYY-MM-DD');
-            this.form.grade_level_id = item.grade_level_id;
-            if(item.grade_level_id) {
-                var gradeLevels = this.gradeLevels.slice().find( obj => obj.id == item.grade_level_id)
-                if(gradeLevels.sections.length){
-                    this.sectionSelect = gradeLevels.sections.map(obj =>{ 
-                        var rObj = {};
-                        rObj.text = obj.name;
-                        rObj.value = obj.id;
-                        return rObj;
-                    });
-                }else{
-                    this.sectionSelect = [];
-                }
-            }
-
+            this.form.grade_level_id = this.grade_level_id;
+            // if(this.gradeLevel.sections.length){
+            //     this.sectionSelect = gradeLevels.sections.map(obj =>{ 
+            //         var rObj = {};
+            //         rObj.text = obj.name;
+            //         rObj.value = obj.id;
+            //         return rObj;
+            //     });
+            // }else{
+            //     this.sectionSelect = [];
+            // }
             this.form.section_id = item.section_id;
             this.$root.$emit('bv::show::modal', 'modalInfo', button)
-        },
-        handleGradeLevelChange() {
-            let vm = this;
-            var gradeLevels = vm.gradeLevels.slice().find( obj => obj.id == event.target.value )
-                
-            if(gradeLevels.sections.length){
-                this.sectionSelect = gradeLevels.sections.map(obj =>{ 
-                    var rObj = {};
-                    rObj.text = obj.name;
-                    rObj.value = obj.id;
-                    return rObj;
-                });
-            }else{
-                this.sectionSelect = [];
-            }
         },
         showAddUser(){
             let vm = this;
@@ -366,7 +326,7 @@ export default {
             let vm = this;  
             swal({
                 title: 'Are you sure?',
-                html:   `Delete ${item.name}. <br> You won't be able to revert this!`,
+                html:   `Delete ${item.user.name}. <br> You won't be able to revert this!`,
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -374,7 +334,7 @@ export default {
                 confirmButtonText: 'Yes, delete it!',
                 showLoaderOnConfirm: true,
                 preConfirm: (login) => {
-                    return  axios.delete(`/api/school/${this.school_id}/student/${item.user.id}/destroy`).then( response => {
+                    return  axios.delete(`/api/school/grade-level/${this.grade_level_id}/student/${item.user.id}/destroy`).then( response => {
                         return response.data;
                     }).catch(error => console.log(error))
                 },
@@ -387,24 +347,27 @@ export default {
             });
         },
         async update () {
-            const { data } = await this.form.patch(`/api/school/${this.school_id}/student/${this.form.id}/update`)
+            const { data } = await this.form.patch(`/api/school/grade-level/${this.grade_level_id}/student/${this.form.id}/update`)
             this.list = data;
         },
         async create () {
-            const { data } = await this.form.post(`/api/school/${this.school_id}/student/create`)
+            const { data } = await this.form.post(`/api/school/grade-level/${this.grade_level_id}/student/create`)
             this.list = data;
         },
         getList() {
             let vm = this;
-            axios.get(`/api/school/${this.school_id}/student/list`).then( response => {
+            axios.get(`/api/school/grade-level/${this.grade_level_id}/student/list`).then( response => {
                 vm.list = response.data;
             }).catch(error => console.log(error))
         },
-        getGradeLevels() {
+        getGradeLevel() {
             let vm = this;
-            axios.get(`/api/school/${this.school_id}/grade-level/list`).then( response => {
-                vm.gradeLevels = response.data;
-            }).catch(error => console.log(error))
+            axios.get(`/api/school/grade-level/${this.grade_level_id}/view`).then( response => {
+                vm.gradeLevel = response.data;
+            }).catch(error => {
+                // Redirect home.
+                vm.$router.push({ name: 'Home' })
+            })
         },
         beforeUpload(file) {
             const isLt1M = file.size / 1024 / 1024 < 1
@@ -425,7 +388,8 @@ export default {
             let vm = this;
             let payload = {
                 users: this.tableData,
-                school_id: this.school_id
+                school_id: this.$route.params.school_id,
+                grade_level_id: this.grade_level_id
             }
             if(this.tableData.length){
                 axios.post(`/api/school/student/import`, payload).then( response => {
@@ -439,7 +403,7 @@ export default {
     mounted: function () {
         let vm = this;
         this.getList()
-        this.getGradeLevels()
+        this.getGradeLevel()
         this.$nextTick(function() {
 
         })

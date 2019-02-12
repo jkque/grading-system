@@ -5,6 +5,7 @@ import i18n from '~/plugins/i18n'
 import App from '~/components/App'
 import BootstrapVue from 'bootstrap-vue'
 import Echo from 'laravel-echo'
+import VueHtmlToPaper from 'vue-html-to-paper';
 
 import '~/plugins'
 import '~/components'
@@ -18,8 +19,22 @@ window.Echo = new Echo({
   encrypted: true
 });
 
+const Printoptions = {
+  name: '_blank',
+  specs: [
+    'fullscreen=yes',
+    'titlebar=yes',
+    'scrollbars=yes'
+  ],
+  styles: [
+    'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css',
+    'css/app.css'
+  ]
+}
+ 
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)
+Vue.use(VueHtmlToPaper, Printoptions);
 
 
 /* eslint-disable no-new */

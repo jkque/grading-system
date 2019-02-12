@@ -62,6 +62,7 @@ import axios from 'axios'
 import Form from 'vform'
 
 export default {
+    props:['school_id'],
     middleware: 'auth',
     name: 'schoolYear',
     computed: {

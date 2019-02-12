@@ -5,9 +5,17 @@ namespace App\Http\Controllers\School;
 use App\User;
 use App\School;
 use App\SchoolUser;
+use App\LessonPlan;
+use App\Performance;
+use App\PerformanceScore;
+use App\UserPerformance;
+use App\Grade;
+use App\SubjectLessonPlan;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Jobs\HandleImportTeacher;
+use Illuminate\Support\Facades\Auth;
+use App\SectionSubject;
 
 class TeacherController extends Controller
 {
@@ -37,6 +45,8 @@ class TeacherController extends Controller
             'birthdate' => $data['birthdate'],
             'password' => bcrypt($data['first_name'].''.$data['last_name']),
         ]);
+
+        $user->assignRole('teacher');
         
         SchoolUser::create([
             'school_id' => $school->id,
@@ -112,5 +122,388 @@ class TeacherController extends Controller
         return response('Import has been processed in the background',202);
     }
 
+    /**
+     * Get teacher setion and subject.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getSectionSubject(Request $request)
+    {
+        return Auth::user()->sectionSubjects->load(['section.students','subject.GradeLevel','lessonPlan' => function ($query) use($request){
+            $query->where('grading_period_id',$request->grading_period_id);
+        }]);
+    }
+
+    /**
+     * create lesson plan.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function createLessonPlan(Request $request)
+    {
+        $performance_sample = [
+            [
+                'name' => 'Homework',
+                'percent' => 0.20,
+            ],
+            [
+                'name' => 'Quiz',
+                'percent' => 0.30,
+            ],
+            [
+                'name' => 'Exam',
+                'percent' => 0.50,
+            ],  
+        ];
+
+        $data = $this->validate($request, [
+            'name' => 'required',
+        ]); 
+        
+        $lessonPlan = LessonPlan::create([
+            'name' => $data['name'],
+            'user_id' => Auth::id()
+        ]);
+
+        foreach ($performance_sample as $key => $performance) {
+            $perf = Performance::create([
+                'name' => $performance['name'],
+                'percentage' => $performance['percent'],
+                'lesson_plan_id' => $lessonPlan->id,
+            ]);
+
+            if($perf->name == 'Exam'){
+                PerformanceScore::create([
+                    'score' => 50,
+                    'performance_id' => $perf->id
+                ]);
+            }else{
+                for ($i=1; $i <= 5; $i++) { 
+                    PerformanceScore::create([
+                        'score' => 10,
+                        'performance_id' => $perf->id
+                    ]);
+                }
+            }
+        }
+
+        return Auth::user()->lessonPlans->load('performances.performanceScore');
+    }
+
+    /**
+     * update lesson plan.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateLessonPlan(Request $request, LessonPlan $lessonPlan)
+    {
+        $data = $this->validate($request, [
+            'name' => 'required',
+        ]);
+
+        tap($lessonPlan)->update($request->only('name'));
+
+        return Auth::user()->lessonPlans->load('performances.performanceScore');
+    }
+
+    /**
+     * Destroy the lesson plan.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function destroyLessonPlan(LessonPlan $lessonPlan)
+    {
+        $lessonPlan->delete();
+        return Auth::user()->lessonPlans->load('performances.performanceScore');
+    }
+
+    /**
+     * Get teacher setion and subject.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function lessonPlanList(Request $request)
+    {
+        return Auth::user()->lessonPlans->load('performances.performanceScore');
+    }
+
+    /**
+     * craft teachers lesson plan.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function craftLessonPlan(Request $request)
+    { 
+        $performance_sample = [
+            [
+                'name' => 'Homework',
+                'percent' => 0.20,
+            ],
+            [
+                'name' => 'Quiz',
+                'percent' => 0.30,
+            ],
+            [
+                'name' => 'Exam',
+                'percent' => 0.50,
+            ],  
+        ];
+
+        $lessonPlan = LessonPlan::create([
+            'name' => 'Default',
+            'user_id' => Auth::id()
+        ]);
+
+        foreach ($performance_sample as $key => $performance) {
+            $perf = Performance::create([
+                'name' => $performance['name'],
+                'percentage' => $performance['percent'],
+                'lesson_plan_id' => $lessonPlan->id,
+            ]);
+
+            if($perf->name == 'Exam'){
+                PerformanceScore::create([
+                    'score' => 50,
+                    'performance_id' => $perf->id
+                ]);
+            }else{
+                for ($i=1; $i <= 5; $i++) { 
+                    PerformanceScore::create([
+                        'score' => 10,
+                        'performance_id' => $perf->id
+                    ]);
+                }
+            }
+        }
+        return Auth::user()->lessonPlans->load('performances.performanceScore');
+    }
+
+    /**
+     * update performance.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updatePerformance(Request $request, Performance $performance)
+    {
+        $data = $this->validate($request, [
+            'name' => 'required',
+            'percentage' => 'required',
+        ]);
+        $performance->name = $request->name;
+        $performance->percentage = $request->percentage/100;
+        $performance->save();
+        return Auth::user()->lessonPlans->load('performances.performanceScore');
+    }
+
+    /**
+     * Destroy the performance.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function destroyPerformance(Performance $performance)
+    {
+        $performance->delete();
+        return Auth::user()->lessonPlans->load('performances.performanceScore');
+    }
+
+    public function createPerformance(Request $request)
+    {
+        
+        $data = $this->validate($request, [
+            'name' => 'required',
+            'percentage' => 'required',
+        ]);
+
+        $perf = Performance::create([
+            'name' => $data['name'],
+            'percentage' => $data['percentage']/100,
+            'lesson_plan_id' => $request->lesson_plan_id,
+        ]);
+
+        foreach ($request->inputs as $key => $value) {
+            PerformanceScore::create([
+                'score' => $request->inputs[$key]['score'],
+                'performance_id' => $perf->id
+            ]);
+        }
+        return Auth::user()->lessonPlans->load('performances.performanceScore');
+
+    }
+
+    /**
+     * update performance scores.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updatePerformanceScores(Request $request)
+    {
+        foreach ($request->inputs as $key => $value) {
+            if(isset($request->inputs[$key]['id'])){
+                $score = PerformanceScore::find($request->inputs[$key]['id']);
+                $score->score = $request->inputs[$key]['score'];
+                $score->save();
+            }else{
+                PerformanceScore::create([
+                    'score' => $request->inputs[$key]['score'],
+                    'performance_id' => $request->id
+                ]);
+            }
+        }
+        return Auth::user()->lessonPlans->load('performances.performanceScore');
+    }
+
+    /**
+     * update section subject lesson plan.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateSectionSubjectLessonPlan(Request $request)
+    {
+        $plan = SubjectLessonPlan::whereLessonPlanId($request->lesson_plan_id)
+            ->whereGradingPeriodId($request->grading_period_id)
+            ->whereSectionId($request->section_id)
+            ->whereSectionSubjectId($request->id)
+            ->first();
+        if(!$plan){
+            $plan = SubjectLessonPlan::create([
+                'section_subject_id' => $request->id,
+                'grading_period_id' => $request->grading_period_id,
+                'section_id' => $request->section_id,
+                'lesson_plan_id' => $request->lesson_plan_id,
+            ]);
+            $students = $plan->section->students;
+            foreach ($students as $student) {
+                foreach ($plan->lessonPlan->performances as $performance) {
+                    foreach ($performance->PerformanceScore as $perfscore) {
+                        UserPerformance::create([
+                            'grading_period_id' => $request->grading_period_id,
+                            'performance_score_id' => $perfscore->id,
+                            'user_id' => $student->user->id
+                        ]);
+                    }
+                }
+            }
+        }
+        return Auth::user()->sectionSubjects->load('section.students','subject.GradeLevel','lessonPlan');
+    }
+
+    /**
+     * add user performances
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateUserPerformances(Request $request)
+    {
+        foreach ($request->users as $key => $value) {
+            foreach ($request->users[$key]['user']['performances'] as $key2 => $perf) {
+                $user_perf = UserPerformance::find($request->users[$key]['user']['performances'][$key2]['id']);
+                $user_perf->score = $request->users[$key]['user']['performances'][$key2]['score'];
+                $user_perf->save();
+            }
+        }
+        return response('Students performances has been updated', 200);
+    }
+
+    /**
+     * get user performances
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getUserPerformances(Request $request)
+    {
+        $plan = SubjectLessonPlan::whereSectionSubjectId($request->section_subject_id)->whereGradingPeriodId($request->grading_period_id)->first();
+        if($plan){
+            $perf_scores_list = $plan->lessonPlan->performances->where('id',$request->performance_id)->load('performanceScore')->first()->performanceScore->pluck('id');
+            return $plan->first()->section->students
+            ->load(['user','user.performances' => function ($query) use($perf_scores_list,$request){
+                $query->whereIn('performance_score_id', $perf_scores_list)->where('grading_period_id',$request->grading_period_id);
+            }]);
+        }else{
+            return [];
+        }
+    }
+
+    /**
+     * update user grades
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateUserGrades(Request $request)
+    {
+        $plan = SubjectLessonPlan::whereId($request->subject_lesson_plan_id)->whereGradingPeriodId($request->grading_period_id)->first();
+        if($plan){
+            $subject = $plan->subject->subject;
+            $students = User::whereIn('id',$request->student_list)->get();
+            foreach ($students as $student) {
+                $total_grade = 0;
+                foreach ($plan->lessonPlan->performances as $performance) {
+                    $perf_scores_list = $performance->performanceScore->pluck('id');
+                    $total_points  = $performance->performanceScore->sum('score');
+                    $students_performances = $student->performances->whereIn('performance_score_id',$perf_scores_list)->where('grading_period_id',$request->grading_period_id);
+                    $student_points = $students_performances->sum('score');
+                    $grade = ( ( $student_points / $total_points) * $performance->percentage) * 100;
+                    $total_grade += $grade;
+                }
+                Grade::updateOrCreate(
+                    ['user_id' => $student->id, 'grading_period_id' => $request->grading_period_id, 'section_id' => $plan->section_id, 'subject_id' => $subject->id],
+                    ['score' => $total_grade]
+                );
+            }
+            return $students->load(['grades' => function ($query) use($subject,$plan){
+                $query->where('section_id',$plan->section_id)->where('subject_id',$subject->id);
+            },'grades.gradingPeriod']);
+        }else{
+            return [];
+        }
+    }
+
+    /**
+     * update grades comment
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateGradesComment(Request $request)
+    {
+        foreach ($request->users as $key => $value) {
+            foreach ($request->users[$key]['grades'] as $key2 => $grade) {
+                $grade = Grade::find($request->users[$key]['grades'][$key2]['id']);
+                $grade->comment = $request->users[$key]['grades'][$key2]['comment'];
+                $grade->save();
+            }
+        }
+        return response('Students grades has been updated', 200);
+    }
+
+    /**
+     * get dashboard report
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function dashboardReport(Request $request)
+    {
+        $section_count = Auth::user()->sectionSubjects->groupBy('section_id')->count();
+        $section_list =  Auth::user()->sectionSubjects->groupBy('section_id')->keys();
+        $sections = Section::whereIn('id',$section_list)->with('students')->get();
+        $student_count = 0;
+        foreach ($sections  as $section) {
+            $student_count += $section->students->count();
+        }
+        return response(['section_count' => $section_count, 'student_count', $student_count], 200);
+    }
 
 }

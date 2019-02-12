@@ -488,6 +488,7 @@ export default {
   computed: {
       ...mapGetters({
           user: 'auth/user',
+          roles: 'auth/roles',
       }),
   },
   components: {

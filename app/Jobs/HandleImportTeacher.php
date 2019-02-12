@@ -46,6 +46,7 @@ class HandleImportTeacher implements ShouldQueue
                 'birthdate' => Carbon::parse($user['birthdate'])->format('Y-m-d'),
                 'password' => bcrypt($user['first_name'].''.$user['last_name']),
             ]);
+            $u->assignRole('teacher');
             
             SchoolUser::create([
                 'school_id' => $school->id,

@@ -85,6 +85,17 @@
                 </div>
             </div>
 
+            <!-- Section -->
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label text-md-right">Adviser</label>
+                <div class="col-md-7">
+                    <b-form-select
+                        :options="teachersSelect"
+                        v-model="form.teacher_id">
+                    </b-form-select>
+                </div>
+            </div>
+
             <div class="form-group row">
                 <div class="col-md-9 ml-md-auto">
                     <v-button :loading="form.busy" type="success">Update</v-button>
@@ -123,7 +134,8 @@ export default {
             form: new Form({
                 inputs: [],
                 id: null,
-                name: ''
+                name: '',
+                teacher_id: null,
             }),
             datePickerOptions: {
                 format: 'YYYY-MM-DD',
@@ -158,6 +170,8 @@ export default {
             addCount: 5,
             inputs: [],
             isShowAdd: false,
+            teachers: [],
+            teachersSelect:[]
         }
     },
     methods:{
@@ -166,6 +180,7 @@ export default {
             this.modalInfo.title = item.name;
             this.form.id = item.id;
             this.form.name = item.name;
+            this.form.teacher_id = item.user_id;
             this.$root.$emit('bv::show::modal', 'modalInfo', button)
         },
         addRow() {
@@ -226,6 +241,20 @@ export default {
                 vm.list = response.data;
             }).catch(error => console.log(error))
         },
+        getTeachers() {
+            let vm = this;
+            axios.get(`/api/school/${this.$route.params.school_id}/teacher/list`).then( response => {
+                vm.teachers = response.data;
+                if(vm.teachers.length){
+                    vm.teachersSelect = vm.teachers.slice().map(obj =>{ 
+                        var rObj = {};
+                        rObj.text = obj.user.name;
+                        rObj.value = obj.user.id;
+                        return rObj;
+                    });
+                }
+            }).catch(error => console.log(error))
+        },
         getGradeLevel() {
             let vm = this;
             axios.get(`/api/school/grade-level/${this.$route.params.grade_level_id}/view`).then( response => {
@@ -240,6 +269,7 @@ export default {
         let vm = this;
         this.getList()
         this.getGradeLevel()
+        this.getTeachers()
         this.$nextTick(function() {
 
         })

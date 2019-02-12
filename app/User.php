@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\ResetPassword as ResetPasswordNotification;
 
@@ -13,6 +14,7 @@ class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
     use HasRoles;
+    use SoftDeletes;
 
     protected $guard_name = 'api';
 
@@ -118,5 +120,25 @@ class User extends Authenticatable implements JWTSubject
     public function advisedSection()
     {
         return $this->hasMany('App\Section');
+    }
+
+    public function sectionSubjects()
+    {
+        return $this->hasMany('App\SectionSubject');
+    }
+
+    public function lessonPlans()
+    {
+        return $this->hasMany('App\LessonPlan');
+    }
+
+    public function performances()
+    {
+        return $this->hasMany('App\UserPerformance');
+    }
+
+    public function grades()
+    {
+        return $this->hasMany('App\Grade');
     }
 }
