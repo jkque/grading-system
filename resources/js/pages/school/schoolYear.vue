@@ -1,5 +1,5 @@
 <template>
-<div class="wrapper">
+<div class="wrapper" v-if="user">
     <div class="animated fadeIn">
         <b-row>
             <b-col sm="12" md="12">
@@ -133,6 +133,7 @@ export default {
     computed: {
         ...mapGetters({
             school: 'auth/school',
+            user: 'auth/user',
         }),
     },
     data: function () {

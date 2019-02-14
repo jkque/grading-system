@@ -18,6 +18,7 @@ class CreateSchoolsTable extends Migration
             $table->string('name')->unique();
             $table->string('address');
             $table->string('contact_number');
+            $table->integer('passing_rate')->default(75);
             $table->unsignedInteger('user_id');
             $table->index(['user_id']);
             $table->foreign('user_id')->references('id')->on('users');

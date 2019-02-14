@@ -17,7 +17,7 @@ class SectionSubjects extends Migration
             $table->increments('id');
             $table->unsignedInteger('section_id');
             $table->unsignedInteger('subject_id');
-            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('user_id')->nullable();
             $table->index(['section_id','subject_id','user_id']);
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('section_id')->references('id')->on('sections');

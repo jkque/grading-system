@@ -7,22 +7,30 @@
                 <b-button variant="outline-primary" @click="showAddUser()"><i class="icon-plus"></i>&nbsp;Add</b-button>
                 <b-button variant="outline-primary" @click="showImportUser()"><i class="icon-arrow-up-circle"></i>&nbsp;Import</b-button>
             </b-col> 
+            <b-col md="12">
+                <b-input-group>
+                    <b-form-input v-model="filter" placeholder="Type to Search" />
+                    <b-input-group-append>
+                    <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+                    </b-input-group-append>
+                </b-input-group>
+            </b-col>
             <b-card-body>
-                <b-table striped hover :items="list" :fields="fields" :responsive="true" :sort-by.sync="sortBy" :show-empty="true">
+                <b-table striped hover :items="filteredStudent" :fields="fields" :responsive="true" :sort-by.sync="sortBy" :show-empty="true" :filter="filter">
                     <template slot="name" slot-scope="data">
-                        {{ data.item.user.name }}
+                        {{ data.item.name }}
                     </template>
-                    <template slot="age" slot-scope="data">
-                        {{ data.item.user.age }}
+                    <template slot="email" slot-scope="data">
+                        {{ data.item.email }}
                     </template>
                     <template slot="address" slot-scope="data">
-                        {{ data.item.user.address }}
+                        {{ data.item.address }}
                     </template>
-                    <template slot="gradeLevel" slot-scope="data">
-                        {{ data.item.grade_level ? data.item.grade_level.name : 'n/a' }}
+                    <template slot="gradeLevel" slot-scope="row">
+                        {{ getGradelevel(row.item) ? getGradelevel(row.item).name : 'n/a' }}
                     </template>
-                    <template slot="section" slot-scope="data">
-                        {{ data.item.section ? data.item.section.name : 'n/a' }}
+                    <template slot="section" slot-scope="row">
+                        {{ getSection(row.item) ? getSection(row.item).name : 'n/a'  }}
                     </template>
                     <template slot="action" slot-scope="row">
                         <b-button size="sm" variant="primary" @click.stop="info(row.item, row.index, $event.target)">
@@ -295,6 +303,8 @@ export default {
             isShowImportUser: false,
             tableData: [],
             tableHeader: [],
+            students: [],
+            filter: '',
         }
     },
     computed: {
@@ -305,6 +315,11 @@ export default {
                 rObj.value = obj.id;
                 return rObj;
             });
+        },
+        filteredStudent() {
+            return this.students.slice().filter(student => 
+                student.name.toLowerCase().includes(this.filter.toLowerCase())
+            );
         }
     },
     methods:{
@@ -312,15 +327,15 @@ export default {
             let vm = this;
             this.form.clear();
             this.form.reset();
-            this.modalInfo.title = item.user.name;
-            this.form.id = item.user.id;
-            this.form.first_name = item.user.first_name;
-            this.form.last_name = item.user.last_name;
-            this.form.address = item.user.address;
-            this.form.birthdate = moment(item.user.birthdate).format('YYYY-MM-DD');
-            this.form.grade_level_id = item.grade_level_id;
+            this.modalInfo.title = item.name;
+            this.form.id = item.id;
+            this.form.first_name = item.first_name;
+            this.form.last_name = item.last_name;
+            this.form.address = item.address;
+            this.form.birthdate = moment(item.birthdate).format('YYYY-MM-DD');
+            this.form.grade_level_id = this.getGradelevel(item) ? this.getGradelevel(item).id : null;
             if(item.grade_level_id) {
-                var gradeLevels = this.gradeLevels.slice().find( obj => obj.id == item.grade_level_id)
+                var gradeLevels = this.gradeLevels.slice().find( obj => obj.id == this.getGradelevel(item).id)
                 if(gradeLevels.sections.length){
                     this.sectionSelect = gradeLevels.sections.map(obj =>{ 
                         var rObj = {};
@@ -332,8 +347,7 @@ export default {
                     this.sectionSelect = [];
                 }
             }
-
-            this.form.section_id = item.section_id;
+            this.form.section_id = this.getSection(item) ? this.getSection(item).id : null;
             this.$root.$emit('bv::show::modal', 'modalInfo', button)
         },
         handleGradeLevelChange() {
@@ -375,7 +389,7 @@ export default {
                 confirmButtonText: 'Yes, delete it!',
                 showLoaderOnConfirm: true,
                 preConfirm: (login) => {
-                    return  axios.delete(`/api/school/${this.school_id}/student/${item.user.id}/destroy`).then( response => {
+                    return  axios.delete(`/api/school/${this.school_id}/student/${item.id}/destroy`).then( response => {
                         return response.data;
                     }).catch(error => console.log(error))
                 },
@@ -384,6 +398,7 @@ export default {
                 if (result.value) {
                     swal('Deleted!', result.value.message, 'success');
                     vm.list = result.value;
+                    vm.getStudents(vm.list);
                 }
             });
         },
@@ -395,10 +410,30 @@ export default {
             const { data } = await this.form.post(`/api/school/${this.school_id}/student/create`)
             this.list = data;
         },
+        getStudents(students) {
+            let vm = this;
+            this.students = [];
+            students.forEach(student => vm.students.push(...[student.user]));
+        },
+        getSection(item) {
+            let find = this.list.slice().find(obj => obj.user_id === item.id)
+            if(find){
+                return find.section ? find.section : null;
+            }
+            return null;
+        },
+        getGradelevel(item) {
+            let find = this.list.slice().find(obj => obj.user_id === item.id)
+            if(find){
+                return find.grade_level ? find.grade_level : null;
+            }
+            return null;
+        },
         getList() {
             let vm = this;
             axios.get(`/api/school/${this.school_id}/student/list`).then( response => {
                 vm.list = response.data;
+                this.getStudents(vm.list);
             }).catch(error => console.log(error))
         },
         getGradeLevels() {

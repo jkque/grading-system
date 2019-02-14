@@ -117,6 +117,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany('App\SchoolUser')->with('school');
     }
 
+    public function ownSchool()
+    {
+        return $this->hasOne('App\School');
+    }
+
     public function advisedSection()
     {
         return $this->hasMany('App\Section');
@@ -140,5 +145,10 @@ class User extends Authenticatable implements JWTSubject
     public function grades()
     {
         return $this->hasMany('App\Grade');
+    }
+
+    public function finalGrades()
+    {
+        return $this->hasMany('App\FinalGrade');
     }
 }

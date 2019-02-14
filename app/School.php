@@ -13,7 +13,7 @@ class School extends Model
      *
      * @var array
      */
-    protected $fillable = ['name','contact_number','user_id','address'];
+    protected $fillable = ['name','contact_number','user_id','address','passing_rate'];
 
     public function schoolYears()
     {

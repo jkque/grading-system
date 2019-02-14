@@ -15,11 +15,10 @@ class CreatePerformancesTable extends Migration
     {
         Schema::create('performances', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('name');
             $table->unsignedInteger('lesson_plan_id');
-            $table->integer('score');
-            $table->integer('passing_score')->nullable();
+            $table->decimal('percentage', 5, 2)->default(0.00);
             $table->index(['lesson_plan_id']);
-            $table->integer('passing_score_percentage')->nullable();
             $table->foreign('lesson_plan_id')->references('id')->on('lesson_plans');
             $table->timestamps();
             $table->softDeletes();

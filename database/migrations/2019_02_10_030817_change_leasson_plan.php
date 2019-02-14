@@ -13,34 +13,35 @@ class ChangeLeassonPlan extends Migration
      */
     public function up()
     {
-        Schema::disableForeignKeyConstraints();
-        Schema::rename('performances', 'performance_scores');
+        // Schema::disableForeignKeyConstraints();
+        // Schema::rename('performances', 'performance_scores');
 
-        Schema::table('lesson_plans', function (Blueprint $table) {
-            $table->dropForeign('lesson_plans_subject_id_foreign');
-            $table->dropColumn('subject_id');
-            $table->dropForeign('lesson_plans_grading_period_id_foreign');
-            $table->dropColumn('grading_period_id');
-        });
+        // Schema::table('lesson_plans', function (Blueprint $table) {
+        //     $table->dropForeign('lesson_plans_subject_id_foreign');
+        //     $table->dropColumn('subject_id');
+        //     $table->dropForeign('lesson_plans_grading_period_id_foreign');
+        //     $table->dropColumn('grading_period_id');
+        // });
 
-        Schema::create('performances', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->unsignedInteger('lesson_plan_id');
-            $table->decimal('percentage', 5, 2)->default(0.00);
-            $table->index(['lesson_plan_id']);
-            $table->foreign('lesson_plan_id')->references('id')->on('lesson_plans');
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        // Schema::create('performance_scores', function (Blueprint $table) {
+        //     $table->increments('id');
+        //     $table->unsignedInteger('performance_id');
+        //     $table->integer('score');
+        //     $table->integer('passing_score')->nullable();
+        //     $table->index(['performance_id']);
+        //     $table->integer('passing_score_percentage')->nullable();
+        //     $table->foreign('performance_id')->references('id')->on('performances');
+        //     $table->timestamps();
+        //     $table->softDeletes();
+        // });
 
-        Schema::table('performance_scores', function (Blueprint $table) {
-            $table->dropForeign('performances_lesson_plan_id_foreign');
-            $table->dropColumn('lesson_plan_id');
-            $table->unsignedInteger('performance_id');
-            $table->index(['performance_id']);
-            $table->foreign('performance_id')->references('id')->on('performances');
-        });
+        // Schema::table('performance_scores', function (Blueprint $table) {
+        //     $table->dropForeign('performances_lesson_plan_id_foreign');
+        //     $table->dropColumn('lesson_plan_id');
+        //     $table->unsignedInteger('performance_id');
+        //     $table->index(['performance_id']);
+        //     $table->foreign('performance_id')->references('id')->on('performances');
+        // });
 
         Schema::create('subject_lesson_plans', function (Blueprint $table) {
             $table->increments('id');
@@ -69,5 +70,6 @@ class ChangeLeassonPlan extends Migration
     public function down()
     {
         Schema::drop('subject_lesson_plans');
+        Schema::drop('performance_scores');
     }
 }

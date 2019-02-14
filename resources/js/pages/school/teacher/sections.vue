@@ -1,5 +1,5 @@
 <template>
-<div class="wrapper">
+<div class="wrapper" v-if="user">
     <div class="animated fadeIn">
         <b-card no-header  v-if="isMain">
             <template slot="header">Classes {{getActiveGP().name}}</template>
@@ -140,6 +140,7 @@
                             <b-col>Name</b-col>
                             <b-col v-for="(field, index) in fieldsGrading" :key="index">{{ field.key}}</b-col>
                             <b-col>Final</b-col>
+                            <b-col>Remarks</b-col>
                         </b-row>
                         <b-row  v-if="!filteredStudent.length">
                             <b-col>No records available.</b-col>
@@ -155,6 +156,7 @@
                                 </b-col>
                             </template>
                             <b-col :key="'final-'+index">{{computeFinalGrade(student.grades)}}</b-col>
+                            <b-col :key="'final-'+index"><b>{{computeFinalGrade(student.grades) >= school.passing_rate ? 'PASSED' : 'FAILED'}}</b></b-col>
                         </b-row>
                 </b-card-body>
                 <b-col md="12">
@@ -212,6 +214,7 @@ export default {
     name: 'Classes',
     computed: {
         ...mapGetters({
+            user: 'auth/user',
             school: 'auth/school',
         }),
         filteredStudent() {

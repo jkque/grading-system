@@ -31,13 +31,10 @@ class FetchController extends Controller
      */
     public function dashboardReport(Request $request)
     {
-        $section_count = Auth::user()->sectionSubjects->groupBy('section_id')->count();
-        $section_list =  Auth::user()->sectionSubjects->groupBy('section_id')->keys();
-        $sections = Section::whereIn('id',$section_list)->with('students')->get();
-        $student_count = 0;
-        foreach ($sections  as $section) {
-            $student_count += $section->students->count();
-        }
-        return response(['section_count' => $section_count, 'student_count', $student_count], 200);
+        $grade_level_count = Auth::user()->ownSchool->gradeLevels->count();
+        $members_count = Auth::user()->ownSchool->members->count();
+        $students_count = Auth::user()->ownSchool->students->count();
+        $teachers_count = Auth::user()->ownSchool->teachers->count();
+        return response(['grade_level_count' => $grade_level_count, 'members_count'=> $members_count, 'students_count'=> $students_count, 'teachers_count' => $teachers_count], 200);
     }
 }

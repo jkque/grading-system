@@ -1,5 +1,5 @@
 <template>
-<b-col class="wrapper">
+<b-col class="wrapper" v-if="user">
     <b-col class="animated fadeIn">
         <b-card no-header  v-show="isShowList">
             <template slot="header">Lesson Plan</template>
@@ -218,6 +218,7 @@ export default {
     name: 'lessonPlan',
     computed: {
         ...mapGetters({
+            user: 'auth/user',
             school: 'auth/school',
         }),
     },

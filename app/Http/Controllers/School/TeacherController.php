@@ -16,6 +16,9 @@ use App\Http\Controllers\Controller;
 use App\Jobs\HandleImportTeacher;
 use Illuminate\Support\Facades\Auth;
 use App\SectionSubject;
+use App\FinalGrade;
+use App\GradingPeriod;
+use App\Section;
 
 class TeacherController extends Controller
 {
@@ -90,7 +93,7 @@ class TeacherController extends Controller
 
         if($request->filled('password')){
             $this->validate($request, [
-                'password' => 'required|confirmed|min:6',
+                'password' => 'required|min:6',
             ]);
         }
 
@@ -444,6 +447,10 @@ class TeacherController extends Controller
     public function updateUserGrades(Request $request)
     {
         $plan = SubjectLessonPlan::whereId($request->subject_lesson_plan_id)->whereGradingPeriodId($request->grading_period_id)->first();
+        $school = GradingPeriod::find($request->grading_period_id)->school;
+        $is_last_period = $school->gradingPeriods->last()->id == $request->grading_period_id ? true : false;
+        $school_year = $school->schoolYears->where('status',true)->first();
+        $section = $plan->section;
         if($plan){
             $subject = $plan->subject->subject;
             $students = User::whereIn('id',$request->student_list)->get();
@@ -461,6 +468,13 @@ class TeacherController extends Controller
                     ['user_id' => $student->id, 'grading_period_id' => $request->grading_period_id, 'section_id' => $plan->section_id, 'subject_id' => $subject->id],
                     ['score' => $total_grade]
                 );
+                if($is_last_period){
+                    $final_grade = $student->grades->whereIn('grading_period_id',$school->gradingPeriods->pluck('id'))->where('subject_id',$subject->id)->sum('score') / $school->gradingPeriods->count();
+                    FinalGrade::updateOrCreate(
+                        ['user_id' => $student->id, 'school_year_id' => $school_year->id, 'section_id' => $plan->section_id, 'subject_id' => $subject->id],
+                        ['score' => $final_grade]
+                    );
+                }
             }
             return $students->load(['grades' => function ($query) use($subject,$plan){
                 $query->where('section_id',$plan->section_id)->where('subject_id',$subject->id);
@@ -503,7 +517,7 @@ class TeacherController extends Controller
         foreach ($sections  as $section) {
             $student_count += $section->students->count();
         }
-        return response(['section_count' => $section_count, 'student_count', $student_count], 200);
+        return response(['section_count' => $section_count, 'student_count' => $student_count], 200);
     }
 
 }

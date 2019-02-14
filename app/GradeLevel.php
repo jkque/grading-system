@@ -37,4 +37,12 @@ class GradeLevel extends Model
     {
         return $this->hasMany('App\SchoolUser')->where('role', 'teacher')->with('user','section');
     }
+
+    public function getNextLevelAttribute() {
+        $nextLvl = $this->level + 1;
+        return $this->query()
+            ->where('level', $nextLvl)
+            ->where('school_id', $this->school_id)
+            ->first();
+    }
 }

@@ -20,6 +20,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         return $request->user()->load('roles');
     });
     Route::get('user/school', 'School\FetchController@getByUser');
+    Route::get('school/dashboardReport', 'School\FetchController@dashboardReport');
 
     Route::patch('settings/profile', 'Settings\ProfileController@update');
     Route::patch('settings/password', 'Settings\PasswordController@update');
@@ -64,6 +65,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('school/grade-level/{gradeLevel}/student/create', 'School\GradeLevel\StudentController@create');
     Route::delete('school/grade-level/{gradeLevel}/student/{user}/destroy', 'School\GradeLevel\StudentController@destroy');
     Route::patch('school/grade-level/{gradeLevel}/student/{user}/update', 'School\GradeLevel\StudentController@update');
+    Route::patch('school/grade-level/{gradeLevel}/student/level-up-student', 'School\GradeLevel\StudentController@levelUpStudents');
 
     Route::get('school/grade-level/{gradeLevel}/teacher/list', 'School\GradeLevel\TeacherController@list');
     Route::post('school/grade-level/{gradeLevel}/teacher/create', 'School\GradeLevel\TeacherController@create');
@@ -91,6 +93,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('teacher/performance/create', 'School\TeacherController@createPerformance');
     Route::patch('teacher/performanceScore/update', 'School\TeacherController@updatePerformanceScores');
     Route::post('teacher/section-subject/lesson-plan/update', 'School\TeacherController@updateSectionSubjectLessonPlan');
+    Route::get('teacher/dashboardReport', 'School\TeacherController@dashboardReport');
+
     Route::post('student/performance/update', 'School\TeacherController@updateUserPerformances');
     Route::get('student/performance/list', 'School\TeacherController@getUserPerformances');
     Route::post('student/grades/update', 'School\TeacherController@updateUserGrades');

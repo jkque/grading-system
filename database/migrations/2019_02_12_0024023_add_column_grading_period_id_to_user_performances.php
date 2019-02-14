@@ -13,12 +13,12 @@ class AddColumnGradingPeriodIdToUserPerformances extends Migration
      */
     public function up()
     {
-        Schema::disableForeignKeyConstraints();
-        Schema::table('user_performances', function (Blueprint $table) {
-            $table->unsignedInteger('grading_period_id')->after('user_id');
-            $table->index(['grading_period_id']);
-            $table->foreign('grading_period_id')->references('id')->on('grading_periods');
-        });
+        // Schema::disableForeignKeyConstraints();
+        // Schema::table('user_performances', function (Blueprint $table) {
+        //     $table->unsignedInteger('grading_period_id')->after('user_id');
+        //     $table->index(['grading_period_id']);
+        //     $table->foreign('grading_period_id')->references('id')->on('grading_periods');
+        // });
     }
 
     /**
@@ -28,10 +28,10 @@ class AddColumnGradingPeriodIdToUserPerformances extends Migration
      */
     public function down()
     {
-        Schema::disableForeignKeyConstraints();
-        Schema::table('user_performances', function (Blueprint $table) {
-            $table->dropForeign('user_performances_grading_period_id_foreign');
-            $table->dropColumn('grading_period_id');
-        });
+        // Schema::disableForeignKeyConstraints();
+        // Schema::table('user_performances', function (Blueprint $table) {
+        //     $table->dropForeign('user_performances_grading_period_id_foreign');
+        //     $table->dropColumn('grading_period_id');
+        // });
     }
 }
