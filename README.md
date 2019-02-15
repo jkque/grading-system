@@ -18,7 +18,7 @@
 - `php artisan key:generate` and `php artisan jwt:secret`
 - Edit `.env` and set your database connection details
 - `php artisan migrate`
-- `php artisan auth:generate-roles`
+- `php artisan auth:generate-roles` (admin, school_admin, teacher, student, gurdian)
 - `php artisan db:seed`
 
 
