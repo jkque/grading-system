@@ -22,7 +22,7 @@ class SectionController extends Controller
             $section = Section::create([
                 'grade_level_id' => $gradeLevel->id,
                 'name' => $request->inputs[$key]['name'],
-                'user_id' => $request->inputs[$key]['teacher_id'] ?? null
+                'user_id' => $request->inputs[$key]['user_id'] ?? null
             ]);
 
             foreach ($gradeLevel->subjects as $subject) {
@@ -60,7 +60,15 @@ class SectionController extends Controller
         $this->validate($request, [
             'name' => 'required',
         ]);
-        tap($section)->update($request->only('name','teacher_id'));
+        tap($section)->update($request->only('name','user_id')); 
+        if($request->user_id){
+            foreach ($section->gradeLevel->subjects as $subject) {
+                SectionSubject::updateOrCreate(
+                    ['section_id' => $section->id,'subject_id' => $subject->id],
+                    ['user_id' => $request->user_id]
+                );
+            }
+        }
         return $section->gradeLevel->sections->load('subjects','students','adviser');
     }
 }

@@ -57,8 +57,14 @@ export default {
           middleware: ['teacher']
         },
         {
-          name: 'Lesson Plans',
-          url: `/lesson-plans`,
+          name: 'Class Record',
+          url: `/class-records`,
+          icon: 'icon-list',
+          middleware: ['teacher']
+        },
+        {
+          name: 'Sections',
+          url: `/sections`,
           icon: 'icon-list',
           middleware: ['teacher']
         },

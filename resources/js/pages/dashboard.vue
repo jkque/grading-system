@@ -19,7 +19,7 @@
           <small class="text-muted text-uppercase font-weight-bold">Students</small>
         </b-card>
       </b-col>
-      <b-col sm="6" md="2">
+      <!-- <b-col sm="6" md="2">
         <b-card>
           <div class="h1 text-muted text-right mb-4">
             <i class="icon-basket-loaded"></i>
@@ -58,7 +58,7 @@
           <small class="text-muted text-uppercase font-weight-bold">Comments</small>
           <b-progress height={} class="progress-xs mt-3 mb-0" variant="info" :value="25"/>
         </b-card>
-      </b-col>
+      </b-col> -->
     </b-row><!--/.row-->
     <b-row v-if="roles.includes('school_admin') && user">
       <b-col sm="6" md="2">

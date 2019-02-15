@@ -2,7 +2,7 @@
 <b-col class="wrapper" v-if="user">
     <b-col class="animated fadeIn">
         <b-card no-header  v-show="isShowList">
-            <template slot="header">Lesson Plan</template>
+            <template slot="header">Class Record</template>
             <b-col md="4">
                 <b-btn variant="outline-primary"  @click="showAddPlan()"><i class="icon-plus"></i>&nbsp;Add</b-btn>
             </b-col> 
@@ -27,7 +27,7 @@
         </b-card>
 
         <b-card no-header  v-show="isShowPerformanceList">
-            <template slot="header">Lesson Plan / Peformance</template>
+            <template slot="header">Class Record / Peformance</template>
             <b-col md="4">
                 <b-btn variant="outline-primary" @click="showAddPerformance()"><i class="icon-plus" ></i>&nbsp;Add</b-btn>
             </b-col> 
@@ -104,7 +104,7 @@
                 <!-- <b-button href="#" variant="primary">Go somewhere</b-button> -->
         </b-card>
 
-        <b-card header="Lesson Plan / Peformance / Score" v-show="isShowAddScore">
+        <b-card header="Class Record / Peformance / Score" v-show="isShowAddScore">
             <b-card-body class="add-section">
                 <form @submit.prevent="updateScore" @keydown="form.onKeydown($event)">
                     <alert-success :form="form" :message="'Performance has been added'"/>
@@ -144,7 +144,7 @@
     <!-- Info modal -->
     <b-modal id="modalInfo" :title="modalInfo.title" v-model="modalInfoShow">
         <form @submit.prevent="update" @keydown="form.onKeydown($event)">
-            <alert-success :form="form" :message="'Lesson Plan has been updated'"/>
+            <alert-success :form="form" :message="'Class Record has been updated'"/>
 
             <!-- Name -->
             <div class="form-group row">
@@ -176,9 +176,9 @@
     </b-modal>
 
     <!-- Add modal -->
-    <b-modal id="modalAdd" :title="'Add new lesson plan'" v-model="modalAddShow">
+    <b-modal id="modalAdd" :title="'Add new Class Record'" v-model="modalAddShow">
         <form @submit.prevent="createPlan" @keydown="form.onKeydown($event)">
-            <alert-success :form="form" :message="'Lesson plan has been added'"/>
+            <alert-success :form="form" :message="'Class Record has been added'"/>
 
             <!-- Name -->
             <div class="form-group row">
@@ -223,7 +223,7 @@ export default {
         }),
     },
     metaInfo () {
-        return { title: 'Lesson Plan' }
+        return { title: 'Class Record' }
     },
     data: function () {
         return {

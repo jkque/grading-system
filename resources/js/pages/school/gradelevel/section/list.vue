@@ -91,7 +91,7 @@
                 <div class="col-md-7">
                     <b-form-select
                         :options="teachersSelect"
-                        v-model="form.teacher_id">
+                        v-model="form.user_id">
                     </b-form-select>
                 </div>
             </div>
@@ -135,7 +135,7 @@ export default {
                 inputs: [],
                 id: null,
                 name: '',
-                teacher_id: null,
+                user_id: null,
             }),
             datePickerOptions: {
                 format: 'YYYY-MM-DD',
@@ -180,7 +180,7 @@ export default {
             this.modalInfo.title = item.name;
             this.form.id = item.id;
             this.form.name = item.name;
-            this.form.teacher_id = item.user_id;
+            this.form.user_id = item.user_id;
             this.$root.$emit('bv::show::modal', 'modalInfo', button)
         },
         addRow() {

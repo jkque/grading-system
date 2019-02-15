@@ -6,6 +6,7 @@ import App from '~/components/App'
 import BootstrapVue from 'bootstrap-vue'
 import Echo from 'laravel-echo'
 import VueHtmlToPaper from 'vue-html-to-paper';
+import FullCalendar from 'vue-full-calendar'
 
 import '~/plugins'
 import '~/components'
@@ -34,6 +35,7 @@ const Printoptions = {
  
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)
+Vue.use(FullCalendar)
 Vue.use(VueHtmlToPaper, Printoptions);
 
 

@@ -31,6 +31,7 @@ const sectionSubjects = () => import('~/pages/school/gradelevel/section/subjects
 
 const teacherSections = () => import('~/pages/school/teacher/sections').then(m => m.default || m)
 const teacherLessonPlans = () => import('~/pages/school/teacher/lessonPlans').then(m => m.default || m)
+const teacherClasses= () => import('~/pages/school/teacher/classes').then(m => m.default || m)
 
 
 
@@ -80,7 +81,6 @@ export default [
           { path: 'grading-period', name: 'Grading Period', component: gradingPeriod },
           { path: 'students', component: schoolStudents, meta: { label: 'Students'}, props: true },
           { path: 'teachers', component: schoolTeachers, meta: { label: 'Teachers'}, props: true },
-          { path: 'calendar', component: schoolCalenar, meta: { label: 'Calendar'}, props: true },
           { 
             path: 'grade-level', 
             redirect: 'grade-level',
@@ -136,8 +136,9 @@ export default [
           },
         ],
       },
-      { path: 'classes', component: teacherSections, meta: { label: 'Classes'}},
-      { path: 'lesson-plans', component: teacherLessonPlans, meta: { label: 'Lesson Plans'}},
+      { path: 'calendar', component: schoolCalenar, meta: { label: 'Calendar'}},
+      { path: 'classes', component: teacherClasses, meta: { label: 'Classes'}},
+      { path: 'class-records', component: teacherLessonPlans, meta: { label: 'Class Records'}},
     ]
   },
 
