@@ -138,6 +138,7 @@ export default [
       },
       { path: 'calendar', component: schoolCalenar, meta: { label: 'Calendar'}},
       { path: 'classes', component: teacherClasses, meta: { label: 'Classes'}},
+      { path: 'sections', component: teacherSections, meta: { label: 'Sections'}},
       { path: 'class-records', component: teacherLessonPlans, meta: { label: 'Class Records'}},
     ]
   },

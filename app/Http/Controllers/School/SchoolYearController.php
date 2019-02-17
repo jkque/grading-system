@@ -6,6 +6,8 @@ use App\SchoolYear;
 use App\School;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Jobs\HandleLevelUpStudents;
+use Illuminate\Support\Facades\Auth;
 
 class SchoolYearController extends Controller
 {
@@ -48,14 +50,14 @@ class SchoolYearController extends Controller
         ]);
 
         $school_years = $schoolYear->school->schoolYears;
-        if($request->status){
-            if($school_years->where('status',true)->isNotEmpty()){
-                if($school_years->where('status',true)->where('id','!=',$schoolYear->id)->isNotEmpty()){
-                    return response(['success' => false, 'message' => 'There should only be one active school year'],422);
-                }
-            }
-        }
-        tap($schoolYear)->update($request->only('start', 'end', 'status'));
+        // if($request->status){
+        //     if($school_years->where('status',true)->isNotEmpty()){
+        //         if($school_years->where('status',true)->where('id','!=',$schoolYear->id)->isNotEmpty()){
+        //             return response(['success' => false, 'message' => 'There should only be one active school year'],422);
+        //         }
+        //     }
+        // }
+        tap($schoolYear)->update($request->only('start', 'end'));
         return $schoolYear->school->load('schoolYears','gradeLevels.subjects','gradingPeriods');
     }
 
@@ -69,11 +71,30 @@ class SchoolYearController extends Controller
     {
         $school = $schoolYear->school;
         $school_years = $school->schoolYears;
-        if($school_years->where('status',true)->count() === 1){
+        if($schoolYear->status){
             return response()->json(['success' => false, 'message' => 'There should be one active school year']);
         }
         $schoolYear->delete();
 
+        return $school->load('schoolYears','gradeLevels.subjects','gradingPeriods');
+    }
+
+    /**
+     * Destroy the school year.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function readyForEnrollment(SchoolYear $schoolYear)
+    {
+        $school = $schoolYear->school;
+        $school->schoolYears()->where('id','!=',$schoolYear->id)->update(['status' => false]);
+        $schoolYear->status = true;
+        $schoolYear->save();
+        $data = new \stdClass;
+        $data->auth_id = Auth::id();
+        $data->auth_email = Auth::user()->email;
+        HandleLevelUpStudents::dispatch((object)$school,$data);
         return $school->load('schoolYears','gradeLevels.subjects','gradingPeriods');
     }
 

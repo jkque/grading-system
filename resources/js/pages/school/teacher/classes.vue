@@ -385,7 +385,7 @@ export default {
         },
         getList() {
             let vm = this;
-            axios.get(`/api/teacher/sections/list`,{
+            axios.get(`/api/teacher/class/list`,{
                 params:{
                     grading_period_id: this.getActiveGP().id
                 }
@@ -479,7 +479,8 @@ export default {
             axios.post(`/api/student/grades/update`,{
                 subject_lesson_plan_id: vm.activeClass.lesson_plan ?  vm.activeClass.lesson_plan.id : null,
                 grading_period_id: vm.getActiveGP().id,
-                student_list: student_list
+                student_list: student_list,
+                section_subject_id: item.id,
             }).then( response => {
                 vm.students = response.data;
                 if (vm.students.length) {

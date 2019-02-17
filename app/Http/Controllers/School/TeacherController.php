@@ -104,11 +104,12 @@ class TeacherController extends Controller
         ]);
         
         if($request->filled('grade_level_id')){
-            SchoolUser::whereUserId($user->id)->whereGradeLevelId($school->grade_level_id)->whereRole('teacher')->update(['grade_level_id' => $request->grade_level_id]);
+            SchoolUser::whereUserId($user->id)->whereRole('teacher')->update(['grade_level_id' => $request->grade_level_id]);
         }
 
         if($request->filled('section_id')){
-            SchoolUser::whereUserId($user->id)->whereSectionId($school->section_id)->whereRole('teacher')->update(['section_id' => $request->section_id]);
+            Section::whereId($request->section_id)->update(['user_id' => $user->id]);
+            SchoolUser::whereUserId($user->id)->whereRole('teacher')->update(['section_id' => $request->section_id]);
         }
         return $school->teachers;
     }
@@ -136,6 +137,23 @@ class TeacherController extends Controller
         return Auth::user()->sectionSubjects->load(['section.students','subject.GradeLevel','lessonPlan' => function ($query) use($request){
             $query->where('grading_period_id',$request->grading_period_id);
         }]);
+    }
+
+    /**
+     * Get teacher setions.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getSections(Request $request)
+    {
+        $section_list = Auth::user()->sectionSubjects->groupBy('section_id')->keys();
+        $sections = Section::whereIn('id',$section_list)->with(['gradeLevel','gradeLevel.subjects','students','students.user.grades' => function($q) use($section_list){
+            $q->whereIn('section_id',$section_list);
+        },'students.user.finalGrades' => function($q) use($section_list){
+            $q->whereIn('section_id',$section_list);
+        },'students.user.grades.subject'],'students.user.finalGrades.subject')->get();
+        return $sections;
     }
 
     /**
@@ -388,16 +406,23 @@ class TeacherController extends Controller
             foreach ($students as $student) {
                 foreach ($plan->lessonPlan->performances as $performance) {
                     foreach ($performance->PerformanceScore as $perfscore) {
-                        UserPerformance::create([
-                            'grading_period_id' => $request->grading_period_id,
-                            'performance_score_id' => $perfscore->id,
-                            'user_id' => $student->user->id
-                        ]);
+                        $checked = UserPerformance::whereUserId($student->user->id)
+                        ->whereGradingPeriodId($request->grading_period_id)->whereSectionSubjectId($request->id)->wherePerformanceScoreId($perfscore->id)->first();
+                        if(!$checked){
+                            UserPerformance::create([
+                                'grading_period_id' => $request->grading_period_id,
+                                'performance_score_id' => $perfscore->id,
+                                'user_id' => $student->user->id,
+                                'section_subject_id' => $request->id
+                            ]);
+                        }
                     }
                 }
             }
         }
-        return Auth::user()->sectionSubjects->load('section.students','subject.GradeLevel','lessonPlan');
+        return Auth::user()->sectionSubjects->load(['section.students','subject.GradeLevel','lessonPlan' => function ($query) use($request){
+            $query->where('grading_period_id',$request->grading_period_id);
+        }]);
     }
 
     /**
@@ -429,9 +454,9 @@ class TeacherController extends Controller
         $plan = SubjectLessonPlan::whereSectionSubjectId($request->section_subject_id)->whereGradingPeriodId($request->grading_period_id)->first();
         if($plan){
             $perf_scores_list = $plan->lessonPlan->performances->where('id',$request->performance_id)->load('performanceScore')->first()->performanceScore->pluck('id');
-            return $plan->first()->section->students
+            return $plan->section->students
             ->load(['user','user.performances' => function ($query) use($perf_scores_list,$request){
-                $query->whereIn('performance_score_id', $perf_scores_list)->where('grading_period_id',$request->grading_period_id);
+                $query->whereIn('performance_score_id', $perf_scores_list)->where('grading_period_id',$request->grading_period_id)->whereSectionSubjectId($request->section_subject_id);
             }]);
         }else{
             return [];
@@ -459,7 +484,8 @@ class TeacherController extends Controller
                 foreach ($plan->lessonPlan->performances as $performance) {
                     $perf_scores_list = $performance->performanceScore->pluck('id');
                     $total_points  = $performance->performanceScore->sum('score');
-                    $students_performances = $student->performances->whereIn('performance_score_id',$perf_scores_list)->where('grading_period_id',$request->grading_period_id);
+                    $students_performances = $student->performances->whereIn('performance_score_id',$perf_scores_list)->where('grading_period_id',$request->grading_period_id)
+                    ->where('section_subject_id',$request->section_subject_id);
                     $student_points = $students_performances->sum('score');
                     $grade = ( ( $student_points / $total_points) * $performance->percentage) * 100;
                     $total_grade += $grade;

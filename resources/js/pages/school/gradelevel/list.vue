@@ -16,7 +16,7 @@
                     <b-button variant="link" class="px-0" :to="{ path: `${$route.fullPath}/${data.item.id}/students` }">{{ data.item.students.length }} Students</b-button>
                 </template>
                 <template slot="teachers" slot-scope="data">
-                    <b-button variant="link" class="px-0" :to="{ path: `${$route.fullPath}/${data.item.id}/teachers` }">{{ data.item.teachers.length }} Techers</b-button>
+                    <b-button variant="link" class="px-0" :to="{ path: `${$route.fullPath}/${data.item.id}/teachers` }">{{ data.item.teachers.length }} Teachers</b-button>
                 </template>
                 <template slot="subjects" slot-scope="data">
                     <b-button variant="link" class="px-0" :to="{ path: `${$route.fullPath}/${data.item.id}/subjects` }">{{ data.item.subjects.length }} Subjects</b-button>

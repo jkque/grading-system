@@ -6,6 +6,7 @@
             <b-col md="4">
                 <b-button variant="outline-primary" @click="showAddUser()"><i class="icon-plus"></i>&nbsp;Add</b-button>
                 <b-button variant="outline-primary" @click="showImportUser()"><i class="icon-arrow-up-circle"></i>&nbsp;Import</b-button>
+                <b-button variant="outline-primary" @click="print()">Print</b-button>
             </b-col> 
             <b-col md="12">
                 <b-input-group>
@@ -15,7 +16,7 @@
                     </b-input-group-append>
                 </b-input-group>
             </b-col>
-            <b-card-body>
+            <b-card-body id="printMe">
                 <b-table striped hover :items="filteredTeacher" :fields="fields" :responsive="true" :sort-by.sync="sortBy" :show-empty="true" :filter="filter">
                     <template slot="name" slot-scope="data">
                         {{ data.item.name }}
@@ -97,7 +98,7 @@
 
                     <!-- Birthdate -->
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label text-md-right">Birrthdate</label>
+                        <label class="col-md-3 col-form-label text-md-right">Birthdate</label>
                         <div class="col-md-7">
                         <datePicker name="birthdate" v-model="form.birthdate" :class="{ 'is-invalid': form.errors.has('birthdate') }" :config="datePickerOptions"></datePicker>
                         <has-error :form="form" field="birthdate"/>
@@ -391,7 +392,7 @@ export default {
             this.form.address = item.address;
             this.form.birthdate = moment(item.birthdate).format('YYYY-MM-DD');
             this.form.grade_level_id = this.getGradelevel(item) ? this.getGradelevel(item).id : null;
-            if(item.grade_level_id){
+            if(this.form.grade_level_id){
                 var gradeLevels = this.gradeLevels.slice().find( obj => obj.id == this.getGradelevel(item).id)
                 if(gradeLevels.sections.length){
                     this.sectionSelect = gradeLevels.sections.map(obj =>{ 
@@ -463,10 +464,12 @@ export default {
         async update () {
             const { data } = await this.form.patch(`/api/school/${this.school_id}/teacher/${this.form.id}/update`)
             this.list = data;
+            this.getTeachers(this.list);
         },
         async create () {
             const { data } = await this.form.post(`/api/school/${this.school_id}/teacher/create`)
             this.list = data;
+            this.getTeachers(this.list);
         },
         getTeachers(teachers) {
             let vm = this;
@@ -528,7 +531,11 @@ export default {
                     vm.tableHeader = [];
                 }).catch(error => console.log(error))
             }
-        }
+        },
+        print() {
+            // Pass the element id here
+            this.$htmlToPaper('printMe');
+        },
     },
     mounted: function () {
         let vm = this;

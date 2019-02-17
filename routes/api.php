@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::patch('school/year/{schoolYear}/update', 'School\SchoolYearController@update');
     Route::post('school/year/{school}/create', 'School\SchoolYearController@create');
     Route::delete('school/year/{schoolYear}/destroy', 'School\SchoolYearController@destroy');
+    Route::post('school/year/{schoolYear}/ready-for-enrollment', 'School\SchoolYearController@readyForEnrollment');
 
     Route::get('school/{school}/student/list', 'School\StudentController@list');
     Route::post('school/{school}/student/create', 'School\StudentController@create');
@@ -81,7 +82,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::patch('section-subject/{sectionSubject}/update', 'School\GradeLevel\Section\SubjectController@update');
     Route::get('school/grade-level/section/{section}/subject/list', 'School\GradeLevel\Section\SubjectController@list');
 
-    Route::get('teacher/sections/list', 'School\TeacherController@getSectionSubject');
+    Route::get('teacher/class/list', 'School\TeacherController@getSectionSubject');
+    Route::get('teacher/sections/list', 'School\TeacherController@getSections');
 
     Route::get('teacher/lesson-plans/list', 'School\TeacherController@lessonPlanList');
     Route::post('teacher/lesson-plans/craft', 'School\TeacherController@craftLessonPlan');

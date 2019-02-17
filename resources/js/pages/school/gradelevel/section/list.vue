@@ -22,10 +22,10 @@
                         {{ data.item.adviser ? data.item.adviser.name : 'n/a' }}
                     </template>
                     <template slot="students" slot-scope="data">
-                        <b-button variant="link" class="px-0" :to="{ path: `${$route.fullPath}/${data.item.id}/students` }">{{ data.item.students ? data.item.students.length : 'n/a' }} Students</b-button>
+                        <b-button variant="link" class="px-0" :to="{ path: `${$route.fullPath}/${data.item.id}/students` }">{{ data.item.students ? data.item.students.length : 0 }} Students</b-button>
                     </template>
                     <template slot="subjects" slot-scope="data">
-                        <b-button variant="link" class="px-0" :to="{ path: `${$route.fullPath}/${data.item.id}/subjects` }">{{ data.item.subjects ? data.item.subjects.length : 'n/a' }} Subjects</b-button>
+                        <b-button variant="link" class="px-0" :to="{ path: `${$route.fullPath}/${data.item.id}/subjects` }">{{ data.item.subjects ? data.item.subjects.length : 0 }} Subjects</b-button>
                     </template>
                     <template slot="action" slot-scope="row">
                         <b-button size="sm" variant="primary" @click.stop="info(row.item, row.index, $event.target)">

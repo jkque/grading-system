@@ -1,5 +1,5 @@
 <template>
-<b-col class="wrapper">
+<b-col class="wrapper" v-if="authenticated">
     <b-col class="animated fadeIn">
         <b-card no-header  v-show="!isShowAddUser && !isShowImportUser">
             <template slot="header">
@@ -8,20 +8,29 @@
             <b-col md="4">
                 <b-button variant="outline-primary" @click="showAddUser()"><i class="icon-plus"></i>&nbsp;Add</b-button>
                 <b-button variant="outline-primary" @click="showImportUser()"><i class="icon-arrow-up-circle"></i>&nbsp;Import</b-button>
+                <b-button variant="outline-primary" @click="print()">Print</b-button>
             </b-col> 
-            <b-card-body>
-                <b-table striped hover :items="list" :fields="fields" :responsive="true" :sort-by.sync="sortBy" :show-empty="true">
+            <b-col md="12">
+                <b-input-group>
+                    <b-form-input v-model="filter" placeholder="Type to Search" />
+                    <b-input-group-append>
+                    <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+                    </b-input-group-append>
+                </b-input-group>
+            </b-col>
+            <b-card-body id="printMe">
+                <b-table striped hover :items="filteredTeacher" :fields="fields" :responsive="true" :sort-by.sync="sortBy" :show-empty="true" :filter="filter">
                     <template slot="name" slot-scope="data">
-                        {{ data.item.user.name }}
+                        {{ data.item.name }}
                     </template>
                     <template slot="age" slot-scope="data">
-                        {{ data.item.user.age }}
+                        {{ data.item.age }}
                     </template>
                     <template slot="address" slot-scope="data">
-                        {{ data.item.user.address }}
+                        {{ data.item.address }}
                     </template>
-                    <template slot="section" slot-scope="data">
-                        {{ data.item.section ? data.item.section.name : 'n/a' }}
+                    <template slot="section" slot-scope="row">
+                        {{ getSection(row.item) ? getSection(row.item).name : 'n/a'  }}
                     </template>
                     <template slot="action" slot-scope="row">
                         <b-button size="sm" variant="primary" @click.stop="info(row.item, row.index, $event.target)">
@@ -311,26 +320,35 @@ export default {
             isShowImportUser: false,
             tableData: [],
             tableHeader: [],
+            teachers: [],
+            filter: ''
         }
     },
     computed: {
-
+        ...mapGetters({
+            authenticated: 'auth/check'
+        }),
+        filteredTeacher() {
+            return this.teachers.slice().filter(teacher => 
+                teacher.name.toLowerCase().includes(this.filter.toLowerCase())
+            );
+        }
     },
     methods:{
         info (item, index, button) {
             let vm = this;
             this.form.clear();
             this.form.reset();
-            this.modalInfo.title = item.user.name;
-            this.form.id = item.user.id;
-            this.form.first_name = item.user.first_name;
-            this.form.last_name = item.user.last_name;
-            this.form.mobile_number = item.user.mobile_number;
-            this.form.email = item.user.email;
-            this.form.address = item.user.address;
-            this.form.birthdate = moment(item.user.birthdate).format('YYYY-MM-DD');
+            this.modalInfo.title = item.name;
+            this.form.id = item.id;
+            this.form.first_name = item.first_name;
+            this.form.last_name = item.last_name;
+            this.form.mobile_number = item.mobile_number;
+            this.form.email = item.email;
+            this.form.address = item.address;
+            this.form.birthdate = moment(item.birthdate).format('YYYY-MM-DD');
             this.getSections();
-            this.form.section_id = item.section_id;
+            this.form.section_id = this.getSection(item) ? this.getSection(item).id : null;
             this.$root.$emit('bv::show::modal', 'modalInfo', button)
         },
         getSections(){
@@ -379,21 +397,25 @@ export default {
                 if (result.value) {
                     swal('Deleted!', result.value.message, 'success');
                     vm.list = result.value;
+                    vm.getTeachers(vm.list);
                 }
             });
         },
         async update () {
             const { data } = await this.form.patch(`/api/school/grade-level/${this.grade_level_id}/teacher/${this.form.id}/update`)
             this.list = data;
+            this.getTeachers(this.list);
         },
         async create () {
             const { data } = await this.form.post(`/api/school/grade-level/${this.grade_level_id}/teacher/create`)
             this.list = data;
+            this.getTeachers(this.list);
         },
         getList() {
             let vm = this;
             axios.get(`/api/school/grade-level/${this.grade_level_id}/teacher/list`).then( response => {
                 vm.list = response.data;
+                vm.getTeachers(vm.list);
             }).catch(error => console.log(error))
         },
         getGradeLevel() {
@@ -404,6 +426,18 @@ export default {
                 // Redirect home.
                 vm.$router.push({ name: 'Home' })
             })
+        },
+        getTeachers(teachers) {
+            let vm = this;
+            this.teachers = [];
+            teachers.forEach(teacher => vm.teachers.push(...[teacher.user]));
+        },
+        getSection(item) {
+            let find = this.list.slice().find(obj => obj.user_id === item.id)
+            if(find){
+                return find.section ? find.section : null;
+            }
+            return null
         },
         beforeUpload(file) {
             const isLt1M = file.size / 1024 / 1024 < 1
@@ -434,7 +468,11 @@ export default {
                     vm.tableHeader = [];
                 }).catch(error => console.log(error))
             }
-        }
+        },
+        print() {
+            // Pass the element id here
+            this.$htmlToPaper('printMe');
+        },
     },
     mounted: function () {
         let vm = this;

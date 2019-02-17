@@ -26,10 +26,13 @@ class SectionController extends Controller
             ]);
 
             foreach ($gradeLevel->subjects as $subject) {
-                SectionSubject::create([
-                    'section_id' => $section->id,
-                    'subject_id' => $subject->id,
-                ]);
+                $checked = SectionSubject::whereSectionId($section->id)->whereSubjectId($subject->id)->first();
+                if(!$checked){
+                    SectionSubject::create([
+                        'section_id' => $section->id,
+                        'subject_id' => $subject->id,
+                    ]);
+                }
             }
         }
         return $gradeLevel->sections;

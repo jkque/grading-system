@@ -27,6 +27,9 @@
                                 <b-button size="sm" variant="danger" @click.stop="remove(row.item, row.index, $event.target)" >
                                     <i class="fa fa-trash-o"></i>&nbsp;Delete
                                 </b-button>
+                                <b-button size="sm" variant="warning" @click.stop="readyForEnrollment(row.item)" v-if="row.index > 0 && !row.item.status">
+                                    <i class="fa fa-pencil-square-o"></i>&nbsp;Ready for enrollment
+                                </b-button>
                             </template>
                         </b-table>
                     </b-card-body>
@@ -59,12 +62,12 @@
             </div>
 
             <!-- Status -->
-            <div class="form-group row">
+            <!-- <div class="form-group row">
                 <label class="col-md-3 col-form-label text-md-right">Status</label>
                 <div class="col-md-7">
                     <c-switch class="mx-1" color="success" variant="pill" :checked="form.status" v-model="form.status"/>
                 </div>
-            </div>
+            </div> -->
 
             <div class="form-group row">
                 <div class="col-md-9 ml-md-auto">
@@ -232,6 +235,31 @@ export default {
             const { data } = await this.form.post(`/api/school/year/${this.school.id}/create`)
 
             this.$store.dispatch('auth/updateSchool', { school: data })
+        },
+        readyForEnrollment(item){
+            let vm = this;
+            swal({
+                title: 'Are you sure?',
+                text: " All students will be evaluated accordingly. Students with passing grade from previous school year will be move to next grade",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Continue!',
+                showLoaderOnConfirm: true,
+                preConfirm: (login) => {
+                    return axios.post(`/api/school/year/${item.id}/ready-for-enrollment`).then( response => {
+                        return response.data;
+                    }).catch(error => console.log(error))
+                },
+                allowOutsideClick: () => !swal.isLoading()
+                }).then((result) => {
+                if (result.value) {
+                    swal('Success!', 'New school year is ready for enrollment.<br> Students are now being processed.<br> Please wait for the email we will send confirming that the process has been done', 'success');
+                    vm.$store.dispatch('auth/updateSchool', { school: result.value })
+                }
+            });
+
         }
     }
 }

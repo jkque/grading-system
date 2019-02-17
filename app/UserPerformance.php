@@ -11,7 +11,7 @@ class UserPerformance extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id','score','manual','performance_score_id','grading_period_id'];
+    protected $fillable = ['user_id','score','manual','performance_score_id','grading_period_id','section_subject_id'];
 
     public function user()
     {
@@ -21,6 +21,11 @@ class UserPerformance extends Model
     public function performanceScore()
     {
         return $this->belongsTo('App\PerformanceScore');
+    }
+
+    public function sectionSubject()
+    {
+        return $this->belongsTo('App\SectionSubject');
     }
      
 }

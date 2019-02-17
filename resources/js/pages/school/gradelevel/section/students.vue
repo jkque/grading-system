@@ -1,5 +1,5 @@
 <template>
-<b-col class="wrapper">
+<b-col class="wrapper" v-if="authenticated">
     <b-col class="animated fadeIn">
         <b-card no-header  v-show="!isShowAddUser && !isShowImportUser">
             <template slot="header">
@@ -8,17 +8,26 @@
             <b-col md="4">
                 <b-button variant="outline-primary" @click="showAddUser()"><i class="icon-plus"></i>&nbsp;Add</b-button>
                 <b-button variant="outline-primary" @click="showImportUser()"><i class="icon-arrow-up-circle"></i>&nbsp;Import</b-button>
+                <b-button variant="outline-primary" @click="print()">Print</b-button>
             </b-col> 
-            <b-card-body>
-                <b-table striped hover :items="list" :fields="fields" :responsive="true" :sort-by.sync="sortBy" :show-empty="true">
+            <b-col md="12">
+                <b-input-group>
+                    <b-form-input v-model="filter" placeholder="Type to Search" />
+                    <b-input-group-append>
+                    <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+                    </b-input-group-append>
+                </b-input-group>
+            </b-col>
+            <b-card-body id="printMe">
+                <b-table striped hover :items="filteredStudent" :fields="fields" :responsive="true" :sort-by.sync="sortBy" :show-empty="true" :filter="filter">
                     <template slot="name" slot-scope="data">
-                        {{ data.item.user.name }}
+                        {{ data.item.name }}
                     </template>
                     <template slot="age" slot-scope="data">
-                        {{ data.item.user.age }}
+                        {{ data.item.age }}
                     </template>
                     <template slot="address" slot-scope="data">
-                        {{ data.item.user.address }}
+                        {{ data.item.address }}
                     </template>
                     <template slot="action" slot-scope="row">
                         <b-button size="sm" variant="primary" @click.stop="info(row.item, row.index, $event.target)">
@@ -227,6 +236,7 @@ export default {
             ],
             modalInfoShow: false,
             list: [],
+            students: [],
             section: {},
             addCount: 5,
             inputs: [],
@@ -234,22 +244,30 @@ export default {
             isShowImportUser: false,
             tableData: [],
             tableHeader: [],
+            filter: '',
         }
     },
     computed: {
-
+        ...mapGetters({
+            authenticated: 'auth/check'
+        }),
+        filteredStudent() {
+            return this.students.slice().filter(student => 
+                student.name.toLowerCase().includes(this.filter.toLowerCase())
+            );
+        }
     },
     methods:{
         info (item, index, button) {
             let vm = this;
             this.form.clear();
             this.form.reset();
-            this.modalInfo.title = item.user.name;
-            this.form.id = item.user.id;
-            this.form.first_name = item.user.first_name;
-            this.form.last_name = item.user.last_name;
-            this.form.address = item.user.address;
-            this.form.birthdate = moment(item.user.birthdate).format('YYYY-MM-DD');
+            this.modalInfo.title = item.name;
+            this.form.id = item.id;
+            this.form.first_name = item.first_name;
+            this.form.last_name = item.last_name;
+            this.form.address = item.address;
+            this.form.birthdate = moment(item.birthdate).format('YYYY-MM-DD');
             this.$root.$emit('bv::show::modal', 'modalInfo', button)
         },
         showAddUser(){
@@ -268,7 +286,7 @@ export default {
             let vm = this;  
             swal({
                 title: 'Are you sure?',
-                html:   `Delete ${item.user.name}. <br> You won't be able to revert this!`,
+                html:   `Delete ${item.name}. <br> You won't be able to revert this!`,
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -276,7 +294,7 @@ export default {
                 confirmButtonText: 'Yes, delete it!',
                 showLoaderOnConfirm: true,
                 preConfirm: (login) => {
-                    return  axios.delete(`/api/school/grade-level/${this.grade_level_id}/student/${item.user.id}/destroy`).then( response => {
+                    return  axios.delete(`/api/school/grade-level/${this.grade_level_id}/student/${item.id}/destroy`).then( response => {
                         return response.data;
                     }).catch(error => console.log(error))
                 },
@@ -285,21 +303,25 @@ export default {
                 if (result.value) {
                     swal('Deleted!', result.value.message, 'success');
                     vm.list = result.value;
+                    vm.getStudents(vm.list);
                 }
             });
         },
         async update () {
             const { data } = await this.form.patch(`/api/school/grade-level/section/${this.section_id}/student/${this.form.id}/update`)
             this.list = data;
+            this.getStudents(this.list);
         },
         async create () {
             const { data } = await this.form.post(`/api/school/grade-level/section/${this.section_id}/student/create`)
             this.list = data;
+            this.getStudents(this.list);
         },
         getList() {
             let vm = this;
             axios.get(`/api/school/grade-level/section/${this.section_id}/student/list`).then( response => {
                 vm.list = response.data;
+                vm.getStudents(vm.list);
             }).catch(error => console.log(error))
         },
         getSection() {
@@ -310,6 +332,11 @@ export default {
                 // Redirect home.
                 vm.$router.push({ name: 'Home' })
             })
+        },
+        getStudents(students) {
+            let vm = this;
+            this.students = [];
+            students.forEach(student => vm.students.push(...[student.user]));
         },
         beforeUpload(file) {
             const isLt1M = file.size / 1024 / 1024 < 1
@@ -341,7 +368,11 @@ export default {
                     vm.tableHeader = [];
                 }).catch(error => console.log(error))
             }
-        }
+        },
+        print() {
+            // Pass the element id here
+            this.$htmlToPaper('printMe');
+        },
     },
     mounted: function () {
         let vm = this;

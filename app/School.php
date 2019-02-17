@@ -20,6 +20,11 @@ class School extends Model
         return $this->hasMany('App\SchoolYear');
     }
 
+    public function activeSchoolYear()
+    {
+        return $this->schoolYears()->where('status',true)->first();
+    }
+
     public function gradeLevels()
     {
         return $this->hasMany('App\GradeLevel');

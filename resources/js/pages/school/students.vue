@@ -3,10 +3,11 @@
     <b-col class="animated fadeIn">
         <b-card no-header  v-show="!isShowAddUser && !isShowImportUser">
             <template slot="header">Students</template>
-            <b-col md="4">
+            <b-col md="6">
                 <b-button variant="outline-primary" @click="showAddUser()"><i class="icon-plus"></i>&nbsp;Add</b-button>
                 <b-button variant="outline-primary" @click="showImportUser()"><i class="icon-arrow-up-circle"></i>&nbsp;Import</b-button>
-            </b-col> 
+                <b-button variant="outline-primary" @click="print()">Print</b-button>
+            </b-col>
             <b-col md="12">
                 <b-input-group>
                     <b-form-input v-model="filter" placeholder="Type to Search" />
@@ -15,7 +16,7 @@
                     </b-input-group-append>
                 </b-input-group>
             </b-col>
-            <b-card-body>
+            <b-card-body id="printMe">
                 <b-table striped hover :items="filteredStudent" :fields="fields" :responsive="true" :sort-by.sync="sortBy" :show-empty="true" :filter="filter">
                     <template slot="name" slot-scope="data">
                         {{ data.item.name }}
@@ -247,7 +248,7 @@ export default {
         UploadExcelComponent 
     },
     middleware: 'auth',
-    name: 'schoolYear',
+    name: 'students',
     data: function () {
         return {
             form: new Form({
@@ -334,7 +335,7 @@ export default {
             this.form.address = item.address;
             this.form.birthdate = moment(item.birthdate).format('YYYY-MM-DD');
             this.form.grade_level_id = this.getGradelevel(item) ? this.getGradelevel(item).id : null;
-            if(item.grade_level_id) {
+            if(this.form.grade_level_id) {
                 var gradeLevels = this.gradeLevels.slice().find( obj => obj.id == this.getGradelevel(item).id)
                 if(gradeLevels.sections.length){
                     this.sectionSelect = gradeLevels.sections.map(obj =>{ 
@@ -405,10 +406,12 @@ export default {
         async update () {
             const { data } = await this.form.patch(`/api/school/${this.school_id}/student/${this.form.id}/update`)
             this.list = data;
+            this.getStudents(this.list);
         },
         async create () {
             const { data } = await this.form.post(`/api/school/${this.school_id}/student/create`)
             this.list = data;
+            this.getStudents(this.list);
         },
         getStudents(students) {
             let vm = this;
@@ -470,7 +473,11 @@ export default {
                     vm.tableHeader = [];
                 }).catch(error => console.log(error))
             }
-        }
+        },
+        print() {
+            // Pass the element id here
+            this.$htmlToPaper('printMe');
+        },
     },
     mounted: function () {
         let vm = this;
