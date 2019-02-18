@@ -66,6 +66,7 @@ export default [
     },
     children: [
       { path: 'dashboard', name: 'Dashboard', component: Dashboard },
+      { path: 'calendar', name: 'Calendar', component: schoolCalenar, meta: { label: 'Calendar'}},
       {
         path: 'school/:school_id',
         name: 'School',
@@ -136,7 +137,6 @@ export default [
           },
         ],
       },
-      { path: 'calendar', component: schoolCalenar, meta: { label: 'Calendar'}},
       { path: 'classes', component: teacherClasses, meta: { label: 'Classes'}},
       { path: 'sections', component: teacherSections, meta: { label: 'Sections'}},
       { path: 'class-records', component: teacherLessonPlans, meta: { label: 'Class Records'}},
