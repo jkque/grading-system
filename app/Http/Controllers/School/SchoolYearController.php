@@ -91,6 +91,10 @@ class SchoolYearController extends Controller
         $school->schoolYears()->where('id','!=',$schoolYear->id)->update(['status' => false]);
         $schoolYear->status = true;
         $schoolYear->save();
+        $grading_period = $school->gradingPeriods->first();
+        $grading_period->status = true;
+        $grading_period->save();
+        $school->gradingPeriods()->where('id','!=',$grading_period->id)->update(['status' => false]);
         $data = new \stdClass;
         $data->auth_id = Auth::id();
         $data->auth_email = Auth::user()->email;
