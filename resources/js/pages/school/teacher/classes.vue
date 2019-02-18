@@ -17,7 +17,7 @@
                     <b-button variant="link" class="px-0" @click="showStudentsList(row.item)">{{ row.item.section.students.length }} Students</b-button>
                 </template>
                 <template slot="classRecord" slot-scope="row">
-                    <b-button variant="link" class="px-0" @click="info(row.item, row.index, $event.target)">{{ row.item.lesson_plan ? row.item.lesson_plan.lesson_plan.name : 'n/a' }}</b-button>
+                    <b-button variant="link" class="px-0" @click="info(row.item, row.index, $event.target)">{{ row.item.lesson_plan ? row.item.lesson_plan.lesson_plan ? row.item.lesson_plan.lesson_plan.name : 'n/a': 'n/a' }}</b-button>
                 </template>
                 <template slot="action" slot-scope="row">
                     <b-button size="sm" variant="success" @click.stop="showPerformanceList(row.item)">

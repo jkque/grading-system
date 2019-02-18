@@ -33,4 +33,19 @@ class SectionSubject extends Model
     {
         return $this->hasOne('App\SubjectLessonPlan')->with('lessonPlan');
     }
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::deleted(function($sectionSubject) {
+            $sectionSubject->lessonPlan()->delete();
+        });
+        
+    }
 }

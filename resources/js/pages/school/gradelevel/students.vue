@@ -69,7 +69,7 @@
 
                     <!-- Birthdate -->
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label text-md-right">Birrthdate</label>
+                        <label class="col-md-3 col-form-label text-md-right">Birthdate</label>
                         <div class="col-md-7">
                         <datePicker name="birthdate" v-model="form.birthdate" :class="{ 'is-invalid': form.errors.has('birthdate') }" :config="datePickerOptions"></datePicker>
                         <has-error :form="form" field="birthdate"/>
@@ -258,7 +258,7 @@ export default {
             modalInfoShow: false,
             list: [],
             gradeLevel: {},
-            // sectionSelect: [],
+            sectionSelect: [],
             addCount: 5,
             inputs: [],
             isShowAddUser: false,
@@ -268,22 +268,22 @@ export default {
         }
     },
     computed: {
-        sectionSelect: function () {
-            let vm = this
-            setTimeout(() => {
-                if(vm.gradeLevel.sections.length){
-                    return vm.gradeLevel.sections.slice().map(obj =>{ 
-                        var rObj = {};
-                        rObj.text = obj.name;
-                        rObj.value = obj.id;
-                        return rObj;
-                    });
-                }else{
-                    return [];
-                }
+        // sectionSelect: function () {
+        //     let vm = this
+        //     setTimeout(() => {
+        //         if(vm.gradeLevel.sections.length){
+        //             return vm.gradeLevel.sections.slice().map(obj =>{ 
+        //                 var rObj = {};
+        //                 rObj.text = obj.name;
+        //                 rObj.value = obj.id;
+        //                 return rObj;
+        //             });
+        //         }else{
+        //             return [];
+        //         }
                 
-            }, 300);
-        }
+        //     }, 300);
+        // }
     },
     methods:{
         info (item, index, button) {
@@ -297,6 +297,7 @@ export default {
             this.form.address = item.user.address;
             this.form.birthdate = moment(item.user.birthdate).format('YYYY-MM-DD');
             this.form.grade_level_id = this.grade_level_id;
+            this.getSections();
             // if(this.gradeLevel.sections.length){
             //     this.sectionSelect = gradeLevels.sections.map(obj =>{ 
             //         var rObj = {};
@@ -310,10 +311,23 @@ export default {
             this.form.section_id = item.section_id;
             this.$root.$emit('bv::show::modal', 'modalInfo', button)
         },
+        getSections(){
+            if(this.gradeLevel.sections.length){
+                this.sectionSelect = this.gradeLevel.sections.map(obj =>{ 
+                    var rObj = {};
+                    rObj.text = obj.name;
+                    rObj.value = obj.id;
+                    return rObj;
+                });
+            }else{
+                this.sectionSelect = [];
+            }
+        },
         showAddUser(){
             let vm = this;
             this.form.clear();
             this.form.reset();
+            this.getSections();
             this.isShowAddUser = true;
         },
         showImportUser(){

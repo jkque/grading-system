@@ -27,7 +27,23 @@ class LessonPlan extends Model
 
     public function subjects()
     {
-        return $this->hasMany('App\SubjectLessonPlan','section_subject_id');
+        return $this->hasMany('App\SubjectLessonPlan','lesson_plan_id');
+    }
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::deleted(function($lessonPlan) {
+            $lessonPlan->subjects()->delete();
+        });
+        
+        
     }
     
 }

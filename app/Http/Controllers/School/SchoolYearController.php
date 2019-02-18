@@ -98,6 +98,13 @@ class SchoolYearController extends Controller
         $data = new \stdClass;
         $data->auth_id = Auth::id();
         $data->auth_email = Auth::user()->email;
+        foreach ($school->gradeLevels as $gradeLevel) {
+            foreach ($gradeLevel->sections as $section) {
+                foreach ($section->subjects as $subject) {
+                    $subject->lessonPlan()->delete();
+                }
+            }
+        }
         HandleLevelUpStudents::dispatch((object)$school,$data);
         return $school->load('schoolYears','gradeLevels.subjects','gradingPeriods');
     }

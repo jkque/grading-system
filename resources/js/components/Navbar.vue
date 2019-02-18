@@ -23,7 +23,7 @@
         <DefaultHeaderDropdownAccnt/>
         <b-nav-item class="px-3 user-name d-md-down-none">{{ user.name }}</b-nav-item>
       </b-navbar-nav>
-      <AsideToggler class="d-none d-lg-block" />
+      <!-- <AsideToggler class="d-none d-lg-block" /> -->
     </AppHeader>
 </template>
 
