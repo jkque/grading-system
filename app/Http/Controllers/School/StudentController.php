@@ -102,31 +102,41 @@ class StudentController extends Controller
 
     public function addEditGuardian(Request $request, School $school)
     {
-        
-        $data = $this->validate($request, [
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'address' => 'required',
-        ]);
-
         if($request->id){
             $user = User::find($request->id);
+        
+            $data = $this->validate($request, [
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'address' => 'required',
+                'email' => 'required|email|unique:users,email,'.$user->id,
+            ]);
+
             if($request->password){
                 $this->validate($request, [
                     'password' => 'required|min:6',
                 ]);
             }
 
-            tap($user)->update($request->only('first_name','last_name','address'));
+            tap($user)->update($request->only('first_name','last_name','address','email'));
 
             $user->update([
                 'password' => bcrypt($request->password),
             ]);
         }else{
+        
+            $data = $this->validate($request, [
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'address' => 'required',
+                'email' => 'required|email|max:255|unique:users',
+            ]);
+
             $user =  User::create([
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
                 'address' => $data['address'],
+                'email' => $data['email'],
                 'password' => bcrypt($data['first_name'].''.$data['last_name']),
             ]);
 

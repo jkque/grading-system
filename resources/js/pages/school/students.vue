@@ -265,6 +265,15 @@
                 </div>
             </div>
 
+            <!-- Email -->
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label text-md-right">{{ $t('email') }}</label>
+                <div class="col-md-7">
+                <input v-model="form.email" :class="{ 'is-invalid': form.errors.has('email') }" class="form-control" type="email" name="email">
+                <has-error :form="form" field="email"/>
+                </div>
+            </div>
+
             <!-- Password -->
             <div class="form-group row">
                 <label class="col-md-3 col-form-label text-md-right">{{ $t('password') }}</label>
@@ -312,6 +321,7 @@ export default {
                 first_name: '',
                 last_name: '',
                 address: '',
+                email: '',
                 birthdate: null,
                 id: null,
                 role: 'student',
@@ -393,6 +403,7 @@ export default {
                 this.form.first_name = item.guardians[0].guardian.first_name;
                 this.form.last_name = item.guardians[0].guardian.last_name;
                 this.form.address = item.guardians[0].guardian.address;
+                this.form.email = item.guardians[0].guardian.email;
             }
             this.$root.$emit('bv::show::modal', 'modalGuardian')
         },

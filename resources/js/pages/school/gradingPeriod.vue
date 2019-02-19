@@ -9,8 +9,8 @@
                 <template slot="name" slot-scope="data">
                     {{ data.item.name }}
                 </template>
-                <template slot="status" slot-scope="data">
-                    <c-switch class="mx-1" color="success" variant="pill" :checked="data.item.status" v-model="data.item.status" @change="handleOnChange($event,data.item.id)"/>
+                <template slot="status" slot-scope="row">
+                    <c-switch class="mx-1" color="success" variant="pill" :checked="row.item.status" v-model="row.item.status" @change="handleOnChange($event,row.item.id,row.index)"/>
                     <!-- <b-badge :variant="getBadge(data.item.status)">{{data.item.status ? 'Active' : 'Inactive'}}</b-badge> -->
                 </template>
                 <!-- <template slot="action" slot-scope="row">
@@ -113,14 +113,17 @@ export default {
         }
     },
     methods:{
-        handleOnChange(event,grading_period_id){
+        handleOnChange(event,grading_period_id,index){
+            let vm = this;
             let payload = {
                 status: event,
             }
-            
             axios.patch(`/api/school/grading-period/${grading_period_id}/setStatus`,payload).then( response => {
                 this.$store.dispatch('auth/updateSchool', { school: response.data })
-            }).catch(error => swal('Warning!', error.response.data, 'warning'))
+            }).catch((error) => {
+                swal('Warning!', error.response.data, 'warning')
+                vm.school.grading_periods[index].status = true
+            })
             
         },
         formatDate (date,format) {
