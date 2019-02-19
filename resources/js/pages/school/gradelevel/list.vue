@@ -21,11 +21,11 @@
                 <template slot="subjects" slot-scope="data">
                     <b-button variant="link" class="px-0" :to="{ path: `${$route.fullPath}/${data.item.id}/subjects` }">{{ data.item.subjects.length }} Subjects</b-button>
                 </template>
-                <template slot="action" slot-scope="row">
+                <!-- <template slot="action" slot-scope="row">
                     <b-button size="sm" variant="primary" @click.stop="info(row.item, row.index, $event.target)">
                         <i class="fa fa-pencil-square-o"></i>&nbsp;Update
                     </b-button>
-                </template>
+                </template> -->
             </b-table>
         </b-card>
     </div>
@@ -106,9 +106,9 @@ export default {
                 {
                     key: 'subjects',
                 },
-                {
-                    key: 'action',
-                }
+                // {
+                //     key: 'action',
+                // }
             ],
             modalInfoShow: false,
             list: [],

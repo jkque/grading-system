@@ -5,6 +5,7 @@ namespace App\Http\Controllers\School;
 use App\User;
 use App\School;
 use App\SchoolUser;
+use App\Relationship;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Jobs\HandleImportStudent;
@@ -13,7 +14,7 @@ class StudentController extends Controller
 {
     public function list(School $school)
     {
-        return $school->students;
+        return $school->students->load('user.guardians');
     }
 
     public function create(Request $request, School $school)
@@ -45,7 +46,7 @@ class StudentController extends Controller
             'section_id' => $request->section_id ?? null
         ]);
 
-        return $school->students;
+        return $school->students->load('user.guardians');
     }
 
     /**
@@ -57,7 +58,7 @@ class StudentController extends Controller
     public function destroy(School $school, User $user)
     {
         SchoolUser::whereUserId($user->id)->whereSchoolId($school->id)->whereRole('student')->delete();
-        return $school->students;
+        return $school->students->load('user.guardians');
     }
 
     /**
@@ -84,7 +85,7 @@ class StudentController extends Controller
         if($request->filled('section_id')){
             SchoolUser::whereUserId($user->id)->whereSchoolId($school->id)->whereRole('student')->update(['section_id' => $request->section_id]);
         }
-        return $school->students;
+        return $school->students->load('user.guardians');
     }
 
     /**
@@ -97,6 +98,54 @@ class StudentController extends Controller
     {
         HandleImportStudent::dispatch((object)$request->all());
         return response('Import has been processed in the background',202);
+    }
+
+    public function addEditGuardian(Request $request, School $school)
+    {
+        
+        $data = $this->validate($request, [
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'address' => 'required',
+        ]);
+
+        if($request->id){
+            $user = User::find($request->id);
+            if($request->password){
+                $this->validate($request, [
+                    'password' => 'required|min:6',
+                ]);
+            }
+
+            tap($user)->update($request->only('first_name','last_name','address'));
+
+            $user->update([
+                'password' => bcrypt($request->password),
+            ]);
+        }else{
+            $user =  User::create([
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'address' => $data['address'],
+                'password' => bcrypt($data['first_name'].''.$data['last_name']),
+            ]);
+
+            $user->assignRole('guardian');
+    
+            SchoolUser::create([
+                'school_id' => $school->id,
+                'user_id' => $user->id,
+                'role' => 'guardian',
+            ]);
+    
+            Relationship::create([
+                'user_id' => $user->id,
+                'student_id' => $request->student_id,
+                'verified' => true,
+            ]);
+        }
+
+        return $school->students->load('user.guardians');
     }
 
 }

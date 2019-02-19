@@ -10,13 +10,14 @@
                     {{ data.item.name }}
                 </template>
                 <template slot="status" slot-scope="data">
-                    <b-badge :variant="getBadge(data.item.status)">{{data.item.status ? 'Active' : 'Inactive'}}</b-badge>
+                    <c-switch class="mx-1" color="success" variant="pill" :checked="data.item.status" v-model="data.item.status" @change="handleOnChange($event,data.item.id)"/>
+                    <!-- <b-badge :variant="getBadge(data.item.status)">{{data.item.status ? 'Active' : 'Inactive'}}</b-badge> -->
                 </template>
-                <template slot="action" slot-scope="row">
+                <!-- <template slot="action" slot-scope="row">
                     <b-button size="sm" variant="primary" @click.stop="info(row.item, row.index, $event.target)">
                         <i class="fa fa-pencil-square-o"></i>&nbsp;Update
                     </b-button>
-                </template>
+                </template> -->
             </b-table>
         </b-card>
     </div>
@@ -104,14 +105,24 @@ export default {
                 {
                     key: 'status',
                 },
-                {
-                    key: 'action',
-                }
+                // {
+                //     key: 'action',
+                // }
             ],
             modalInfoShow: false,
         }
     },
     methods:{
+        handleOnChange(event,grading_period_id){
+            let payload = {
+                status: event,
+            }
+            
+            axios.patch(`/api/school/grading-period/${grading_period_id}/setStatus`,payload).then( response => {
+                this.$store.dispatch('auth/updateSchool', { school: response.data })
+            }).catch(error => swal('Warning!', error.response.data, 'warning'))
+            
+        },
         formatDate (date,format) {
             return moment(date).format(format);
         },

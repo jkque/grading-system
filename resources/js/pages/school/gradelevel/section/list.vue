@@ -51,7 +51,14 @@
                         <li v-for="(input, index) in form.inputs" :key="index">
                             <div class="input-list">
                                 <div class="name">
-                                    <input v-model="input.name" class="form-control" type="text" name="name" placeholder="Section Name">
+                                    <b-input type="text" v-model="input.name" :state="validation(index)" name="name" placeholder="Section Name" class="newSection"/>
+                                    <b-form-invalid-feedback :state="validation(index)">
+                                        Section name already taken
+                                    </b-form-invalid-feedback>
+                                    <b-form-valid-feedback :state="validation(index)">
+                                        Looks Good.
+                                    </b-form-valid-feedback>
+                                    <!-- <input v-model="input.name" class="form-control" type="text" name="name" placeholder="Section Name"> -->
                                 </div>
                                 <div class="remove">
                                     <a href="#" @click="deleteRow(index)"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
@@ -185,21 +192,41 @@ export default {
         },
         addRow() {
             let vm = this;
+            let last_input = parseInt(this.form.inputs.slice().pop().name.split(' ')[1]);
             this.form.inputs.push({
-                name: `Section ${vm.form.inputs.length+1}`,
+                name: `Section ${last_input+1}`,
             })
         },    
         deleteRow(index) {
             this.form.inputs.splice(index,1)
         },
+        validation(index) {
+            let vm = this;
+            let copy_inputs = this.form.inputs.slice()
+            copy_inputs.splice(index,1)
+            let find1 = this.list.slice().filter( section => section.name === vm.form.inputs[index].name)
+            let find2 = copy_inputs.filter( section => section.name === vm.form.inputs[index].name)
+            
+            return !find1.length && !find2.length;
+        },
         showAdd(){
             let vm = this;
             this.form.inputs = [];
             this.form.clear();
+            if(this.list.length){
+                var last_section = parseInt(this.list.slice().pop().name.split(' ')[1]);
+            }
             for (let i = 1; i <= this.addCount; i++) {
-                vm.form.inputs.push({
-                    name: 'Section '+i,
-                })
+                if(this.list.length){
+                    last_section += 1
+                    vm.form.inputs.push({
+                        name: 'Section '+last_section,
+                    })
+                }else{
+                    vm.form.inputs.push({
+                        name: 'Section '+i,
+                    })
+                }
             }
             this.isShowAdd = true;
         },
@@ -231,9 +258,17 @@ export default {
             const { data } = await this.form.patch(`/api/school/section/${this.form.id}/update`)
             this.list = data;
         },
+        checkValidation(){
+            let elements = document.getElementsByClassName('newSection');
+            for (let element of elements) {
+                return element.classList.contains('is-invalid')
+            }
+        },
         async create () {
-            const { data } = await this.form.post(`/api/school/grade-level/${this.gradeLevel.id}/section/create`)
-            this.list = data;
+            if(!this.checkValidation()){
+                const { data } = await this.form.post(`/api/school/grade-level/${this.gradeLevel.id}/section/create`)
+                this.list = data;
+            }
         },
         getList() {
             let vm = this;

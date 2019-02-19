@@ -151,4 +151,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany('App\FinalGrade');
     }
+
+    public function guardians()
+    {
+        return $this->hasMany('App\Relationship','student_id')->with('guardian');
+    }
+
+    public function children()
+    {
+        return $this->hasMany('App\Relationship','user_id')->with('student');
+    }
 }

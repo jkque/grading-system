@@ -38,6 +38,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('school/{school}/student/{user}/destroy', 'School\StudentController@destroy');
     Route::patch('school/{school}/student/{user}/update', 'School\StudentController@update');
     Route::post('school/student/import', 'School\StudentController@import');
+    Route::post('school/{school}/student/guardian/addEditGuardian', 'School\StudentController@addEditGuardian');
+
+    Route::get('school/guardian/{guardian}/children/list', 'School\GuardianController@list');
 
     Route::get('school/{school}/teacher/list', 'School\TeacherController@list');
     Route::post('school/{school}/teacher/create', 'School\TeacherController@create');

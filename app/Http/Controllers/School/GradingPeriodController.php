@@ -19,7 +19,7 @@ class GradingPeriodController extends Controller
         $school = $gradingPeriod->school;
         $grading_periods = $school->gradingPeriods;
         if(!$request->status){
-            if($grading_periods->where('status',true)->count() === 1){
+            if($grading_periods->where('status',true)->count() === 1 && $grading_periods->where('status',true)->where('id',$gradingPeriod->id)->isNotEmpty()){
                 return response('There should only be one active grading period', 422);
             }
         }else{

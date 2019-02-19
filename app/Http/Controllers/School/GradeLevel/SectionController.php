@@ -63,6 +63,12 @@ class SectionController extends Controller
         $this->validate($request, [
             'name' => 'required',
         ]);
+        $checked = $section->gradeLevel->sections->where('id','!=',$section->id)->where('name',$request->name);
+        if($checked->isNotEmpty()){
+            $errors = new \stdClass;
+            $errors->name = ["The name field is already taken."];
+            return response(['errors' => $errors, 'message' => 'The given data was invalid.'],422);
+        }
         tap($section)->update($request->only('name','user_id')); 
         if($request->user_id){
             foreach ($section->gradeLevel->subjects as $subject) {

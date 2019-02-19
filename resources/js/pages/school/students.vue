@@ -40,6 +40,9 @@
                         <b-button size="sm" variant="danger" @click.stop="remove(row.item, row.index, $event.target)" >
                             <i class="fa fa-trash-o"></i>&nbsp;Delete
                         </b-button>
+                        <b-button size="sm" variant="warning" @click.stop="addGuardian(row.item)" >
+                            <i class="fa fa-pencil-square-o"></i>&nbsp;Guardian
+                        </b-button>
                     </template>
                 </b-table>
             </b-card-body>
@@ -228,6 +231,60 @@
             <b-btn class="float-right" variant="secondary" @click="modalInfoShow=false">Close</b-btn>
        </div>
     </b-modal>
+
+
+    <!-- Info modal -->
+    <b-modal id="modalGuardian" :title="modalInfo.title">
+        <form @submit.prevent="addEditGuardian" @keydown="form.onKeydown($event)" id="guardianForm">
+            <alert-success :form="form" :message="'Guardian has been updated'"/>
+
+            <!-- First Name -->
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label text-md-right">First Name</label>
+                <div class="col-md-7">
+                <input v-model="form.first_name" :class="{ 'is-invalid': form.errors.has('first_name') }" class="form-control" type="text" name="first_name">
+                <has-error :form="form" field="first_name"/>
+                </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label text-md-right">Last Name</label>
+                <div class="col-md-7">
+                <input v-model="form.last_name" :class="{ 'is-invalid': form.errors.has('last_name') }" class="form-control" type="text" name="last_name">
+                <has-error :form="form" field="last_name"/>
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label text-md-right">Address</label>
+                <div class="col-md-7">
+                <input v-model="form.address" :class="{ 'is-invalid': form.errors.has('address') }" class="form-control" type="text" name="address">
+                <has-error :form="form" field="address"/>
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label text-md-right">{{ $t('password') }}</label>
+                <div class="col-md-7">
+                <input v-model="form.password" :class="{ 'is-invalid': form.errors.has('password') }" class="form-control" type="password" name="password">
+                <has-error :form="form" field="password"/>
+                </div>
+            </div>
+
+            <!-- <div class="form-group row">
+                <div class="col-md-9 ml-md-auto">
+                    <v-button :loading="form.busy" type="success">Update</v-button>
+                </div>
+            </div> -->
+        </form>
+        <div slot="modal-footer">
+            <v-button :loading="form.busy" type="success" form="guardianForm" style="margin-right:10px">Update</v-button>
+            <b-btn class="float-right" variant="secondary" @click="$root.$emit('bv::hide::modal', 'modalGuardian')">Close</b-btn>
+       </div>
+    </b-modal>
 </b-col>
 </template>
 
@@ -260,6 +317,8 @@ export default {
                 role: 'student',
                 grade_level_id: null,
                 section_id: null,
+                password: null,
+                student_id: null,
             }),
             datePickerOptions: {
                 format: 'YYYY-MM-DD',
@@ -324,6 +383,19 @@ export default {
         }
     },
     methods:{
+        addGuardian(item){
+            this.form.clear();
+            this.form.reset();
+            this.modalInfo.title = 'Add Guardian - '+item.name;
+            this.form.student_id = item.id;
+            if(item.guardians.length){
+                this.form.id = item.guardians[0].guardian.id;
+                this.form.first_name = item.guardians[0].guardian.first_name;
+                this.form.last_name = item.guardians[0].guardian.last_name;
+                this.form.address = item.guardians[0].guardian.address;
+            }
+            this.$root.$emit('bv::show::modal', 'modalGuardian')
+        },
         info (item, index, button) {
             let vm = this;
             this.form.clear();
@@ -402,6 +474,11 @@ export default {
                     vm.getStudents(vm.list);
                 }
             });
+        },
+        async addEditGuardian () {
+            const { data } = await this.form.post(`/api/school/${this.school_id}/student/guardian/addEditGuardian`)
+            this.list = data;
+            this.getStudents(this.list);
         },
         async update () {
             const { data } = await this.form.patch(`/api/school/${this.school_id}/student/${this.form.id}/update`)
