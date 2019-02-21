@@ -78,6 +78,6 @@ class SectionController extends Controller
                 );
             }
         }
-        return $section->gradeLevel->sections->load('subjects','students','adviser');
+        return $section->gradeLevel->sections()->with('adviser','students','subjects')->get();
     }
 }
