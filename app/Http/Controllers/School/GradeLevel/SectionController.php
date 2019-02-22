@@ -4,6 +4,7 @@ namespace App\Http\Controllers\School\GradeLevel;
 
 use App\GradeLevel;
 use App\Section;
+use App\User;
 use App\SchoolUser;
 use App\SectionSubject;
 use Illuminate\Http\Request;
@@ -36,7 +37,7 @@ class SectionController extends Controller
                 }
             }
         }
-        return $gradeLevel->sections;
+        return $gradeLevel->sections()->with('adviser','students','subjects')->get();
         
     }
 
@@ -50,7 +51,7 @@ class SectionController extends Controller
     {
         $gradeLevel = $section->gradeLevel;
         $section->delete();
-        return $gradeLevel->sections;
+        return $gradeLevel->sections()->with('adviser','students','subjects')->get();
     }
 
     /**
@@ -70,11 +71,18 @@ class SectionController extends Controller
             $errors->name = ["The name field is already taken."];
             return response(['errors' => $errors, 'message' => 'The given data was invalid.'],422);
         }
-        tap($section)->update($request->only('name','user_id')); 
+        tap($section)->update($request->only('name','user_id'));
+        $user = User::find($request->user_id);
+        if($user->advisedSection){
+            $errors = new \stdClass;
+            $errors->user_id = ["Teacher has already assigned section."];
+            return response(['errors' => $errors, 'message' => 'The given data was invalid.'],422);
+
+        }
         if($request->user_id){
             // $checked_teacher =  SchoolUser::whereUserId($request->user_id)->whereRole('teacher')->first();
             // if(!$checked_teacher){
-                SchoolUser::whereUserId($request->user_id)->update(['grade_level_id' => $section->gradeLevel->id, 'section_id' =>  $section->id]);
+                SchoolUser::whereUserId($request->user_id)->whereRole('teacher')->update(['grade_level_id' => $section->gradeLevel->id, 'section_id' =>  $section->id]);
             // }
             foreach ($section->gradeLevel->subjects as $subject) {
                 if(SectionSubject::whereSectionId($section->id)->whereSubjectId($subject->id)->whereUserId(null)->first()){

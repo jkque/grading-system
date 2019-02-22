@@ -243,10 +243,12 @@
                 <label class="col-md-3 col-form-label text-md-right">Grade Level</label>
                 <div class="col-md-7">
                     <b-form-select
+                        :class="{ 'is-invalid': form.errors.has('grade_level_id') }"
                         :options="gradeLevelSelect"
                         v-model="form.grade_level_id"
                         @change="handleGradeLevelChange()" >
                     </b-form-select>
+                    <has-error :form="form" field="grade_level_id"/>
                 </div>
             </div>
 
@@ -255,9 +257,11 @@
                 <label class="col-md-3 col-form-label text-md-right">Section</label>
                 <div class="col-md-7">
                     <b-form-select
+                        :class="{ 'is-invalid': form.errors.has('section_id') }"
                         :options="sectionSelect"
                         v-model="form.section_id">
                     </b-form-select>
+                    <has-error :form="form" field="section_id"/>
                 </div>
             </div>
 

@@ -97,9 +97,11 @@
                 <label class="col-md-3 col-form-label text-md-right">Adviser</label>
                 <div class="col-md-7">
                     <b-form-select
+                        :class="{ 'is-invalid': form.errors.has('user_id') }"
                         :options="teachersSelect"
                         v-model="form.user_id">
                     </b-form-select>
+                    <has-error :form="form" field="user_id"/>
                 </div>
             </div>
 

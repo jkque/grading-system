@@ -102,6 +102,17 @@ class TeacherController extends Controller
         $user->update([
             'password' => bcrypt($request->password),
         ]);
+
+        if($request->grade_level_id && $request->section_id){
+            $section = Section::whereId($request->section_id)->first();
+            if($section->gradeLevel->id == $request->grade_level_id && $section->adviser->id != $user->id){
+                $errors = new \stdClass;
+                $errors->grade_level_id = ["The grade level and section is already taken by other teacher."];
+                $errors->section_id = ["The grade level and section is already taken by other teacher."];
+                return response(['errors' => $errors, 'message' => 'The given data was invalid.'],422);
+
+            }
+        }
         
         if($request->filled('grade_level_id')){
             SchoolUser::whereUserId($user->id)->whereRole('teacher')->update(['grade_level_id' => $request->grade_level_id]);
