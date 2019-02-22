@@ -77,10 +77,12 @@ class SectionController extends Controller
                 SchoolUser::whereUserId($request->user_id)->update(['grade_level_id' => $section->gradeLevel->id, 'section_id' =>  $section->id]);
             // }
             foreach ($section->gradeLevel->subjects as $subject) {
-                SectionSubject::updateOrCreate(
-                    ['section_id' => $section->id,'subject_id' => $subject->id],
-                    ['user_id' => $request->user_id]
-                );
+                if(SectionSubject::whereSectionId($section->id)->whereSubjectId($subject->id)->whereUserId(null)->first()){
+                    SectionSubject::updateOrCreate(
+                        ['section_id' => $section->id,'subject_id' => $subject->id],
+                        ['user_id' => $request->user_id]
+                    );
+                }
             }
         }
         return $section->gradeLevel->sections()->with('adviser','students','subjects')->get();

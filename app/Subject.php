@@ -29,4 +29,19 @@ class Subject extends Model
     {
         return $this->belongsTo('App\LessonPlan');
     } 
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::deleted(function($subject) {
+            $subject->sections()->delete();
+        });
+        
+    }
 }
