@@ -193,6 +193,8 @@ export default {
             this.$root.$emit('bv::show::modal', 'modalInfo', button)
         },
         showAdd () {
+            this.form.reset();
+            this.form.clear();
             this.form.start = moment().format('YYYY-MM-DD');
             this.form.end = moment().add(1,'year').format('YYYY-MM-DD');
             this.$root.$emit('bv::show::modal', 'modalAdd')

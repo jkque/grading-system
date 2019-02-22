@@ -4,6 +4,7 @@ namespace App\Http\Controllers\School\GradeLevel;
 
 use App\GradeLevel;
 use App\Section;
+use App\SchoolUser;
 use App\SectionSubject;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -71,6 +72,10 @@ class SectionController extends Controller
         }
         tap($section)->update($request->only('name','user_id')); 
         if($request->user_id){
+            // $checked_teacher =  SchoolUser::whereUserId($request->user_id)->whereRole('teacher')->first();
+            // if(!$checked_teacher){
+                SchoolUser::whereUserId($request->user_id)->update(['grade_level_id' => $section->gradeLevel->id, 'section_id' =>  $section->id]);
+            // }
             foreach ($section->gradeLevel->subjects as $subject) {
                 SectionSubject::updateOrCreate(
                     ['section_id' => $section->id,'subject_id' => $subject->id],

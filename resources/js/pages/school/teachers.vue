@@ -300,7 +300,7 @@ export default {
         UploadExcelComponent 
     },
     middleware: 'auth',
-    name: 'schoolYear',
+    name: 'teacher',
     data: function () {
         return {
             form: new Form({
