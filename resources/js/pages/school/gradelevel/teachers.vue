@@ -380,7 +380,7 @@ export default {
             let vm = this;  
             swal({
                 title: 'Are you sure?',
-                html:   `Delete ${item.user.name}. <br> You won't be able to revert this!`,
+                html:   `Delete ${item.name}. <br> You won't be able to revert this!`,
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -388,7 +388,7 @@ export default {
                 confirmButtonText: 'Yes, delete it!',
                 showLoaderOnConfirm: true,
                 preConfirm: (login) => {
-                    return  axios.delete(`/api/school/grade-level/${this.grade_level_id}/teacher/${item.user.id}/destroy`).then( response => {
+                    return  axios.delete(`/api/school/grade-level/${this.grade_level_id}/teacher/${item.id}/destroy`).then( response => {
                         return response.data;
                     }).catch(error => console.log(error))
                 },
