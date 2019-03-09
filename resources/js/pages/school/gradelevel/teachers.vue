@@ -6,8 +6,8 @@
                 {{`${gradeLevel.name} / Teachers` }}
             </template>
             <b-col md="4">
-                <b-button variant="outline-primary" @click="showAddUser()"><i class="icon-plus"></i>&nbsp;Add</b-button>
-                <b-button variant="outline-primary" @click="showImportUser()"><i class="icon-arrow-up-circle"></i>&nbsp;Import</b-button>
+                <!-- <b-button variant="outline-primary" @click="showAddUser()"><i class="icon-plus"></i>&nbsp;Add</b-button>
+                <b-button variant="outline-primary" @click="showImportUser()"><i class="icon-arrow-up-circle"></i>&nbsp;Import</b-button> -->
                 <b-button variant="outline-primary" @click="print()">Print</b-button>
             </b-col> 
             <b-col md="12">

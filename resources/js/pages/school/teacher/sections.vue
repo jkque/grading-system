@@ -65,7 +65,10 @@
                 <b-card-body class="add-grading" > 
                         <b-row class="header">
                             <b-col>Subject</b-col>
-                            <b-col v-for="(field, index) in school.grading_periods" :key="index">{{ field.name}}</b-col>
+                            <template v-for="(field, index) in school.grading_periods">
+                                <b-col :key="index">{{field.name}}</b-col>
+                                <b-col :key="'remarks-'+index">Remarks</b-col>
+                            </template>
                             <b-col>Final</b-col>
                             <b-col>Remarks</b-col>
                         </b-row>
@@ -74,6 +77,9 @@
                             <template  v-for="(period, index) in school.grading_periods" >
                                 <b-col :key="'score-'+index">
                                     <b>{{getSubjectGrade(subject.id,period.id)}}</b>
+                                </b-col>
+                                <b-col :key="'score-remark'+index">
+                                    <b>{{getSubjectGrade(subject.id,period.id) != 'n/a' ? getSubjectGrade(subject.id,period.id) >= school.passing_rate ? 'PASSED' : 'FAILED' : 'n/a'}}</b>
                                 </b-col>
                             </template>
                             <b-col :key="'final-'+index"><b>{{getSubjectFinalGrade(subject.id)}}</b></b-col>

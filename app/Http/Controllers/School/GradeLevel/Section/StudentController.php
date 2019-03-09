@@ -31,6 +31,7 @@ class StudentController extends Controller
         $user =  User::create([
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
+            'middle_name' => $request->middle_name,
             'address' => $data['address'],
             'birthdate' => $data['birthdate'],
         ]);
@@ -78,7 +79,7 @@ class StudentController extends Controller
             'birthdate' => 'required',
         ]);
         
-        tap($user)->update($request->only('first_name','last_name','address','birthdate'));
+        tap($user)->update($request->only('first_name','last_name','address','birthdate','middle_name'));
         SchoolUser::whereUserId($user->id)->whereSectionId($section->id)->whereRole('student')->update(['section_id' => $request->section_id]);
         return $section->students;
     }

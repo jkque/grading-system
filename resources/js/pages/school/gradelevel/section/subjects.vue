@@ -108,6 +108,8 @@ export default {
     },
     methods:{
         info (item, index, button) {
+            this.form.clear();
+            this.form.reset();
             this.modalInfo.title = item.subject.name;
             this.form.id = item.id;
             this.$root.$emit('bv::show::modal', 'modalInfo', button)

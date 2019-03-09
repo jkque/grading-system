@@ -3,9 +3,6 @@
     <div class="animated fadeIn">
         <b-card header="Grade Level">
             <b-table striped hover :items="list" :fields="fields" :responsive="true" :sort-by.sync="sortBy">
-                <template slot="level" slot-scope="data">
-                    {{ data.item.level }}
-                </template>
                 <template slot="name" slot-scope="data">
                     {{ data.item.name }}
                 </template>
@@ -86,10 +83,6 @@ export default {
             sortBy: 'level',
             modalInfo: { title: '', content: '' },
             fields: [
-                {
-                    key: 'level',
-                    sortable: true
-                },
                 {
                     key: 'name',
                     sortable: true

@@ -85,8 +85,18 @@
                     <ul class="list-unstyled">
                         <li v-for="(input, index) in form.inputs" :key="index">
                             <div class="input-list">
+                                <div class="label">
+                                    Score
+                                </div>
                                 <div class="name">
-                                    <input v-model="input.score" class="form-control" type="text" name="name" placeholder="Score">
+                                    <!-- <input v-model="input.score" class="form-control" type="number" name="name" placeholder="Score"> -->
+                                    <b-input type="number" v-model="input.score" :state="validation(index)" name="name" placeholder="Score" class="newScore"/>
+                                    <b-form-invalid-feedback :state="validation(index)">
+                                        Score should not be null
+                                    </b-form-invalid-feedback>
+                                    <b-form-valid-feedback :state="validation(index)">
+                                        Looks Good.
+                                    </b-form-valid-feedback>
                                 </div>
                                 <div class="remove">
                                     <a href="#" @click="deleteRow(index)"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
@@ -117,7 +127,14 @@
                                     Score
                                 </div>
                                 <div class="name">
-                                    <input v-model="input.score" class="form-control" type="text" name="name" placeholder="Score">
+                                    <!-- <input v-model="input.score" class="form-control" type="text" name="name" placeholder="Score"> -->
+                                    <b-input type="number" v-model="input.score" :state="validation(index)" name="name" placeholder="Score" class="newScore"/>
+                                    <b-form-invalid-feedback :state="validation(index)">
+                                        Score should not be null
+                                    </b-form-invalid-feedback>
+                                    <b-form-valid-feedback :state="validation(index)">
+                                        Looks Good.
+                                    </b-form-valid-feedback>
                                 </div>
                                 <div class="remove">
                                     <a href="#" @click="deleteRow(index)"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
@@ -301,6 +318,13 @@ export default {
             }
             this.$root.$emit('bv::show::modal', 'modalInfo', button)
         },
+        validation(index) {
+            return this.form.inputs[index].score != '' ? true : false;
+        },
+        checkValidation(){
+            let checked = this.form.inputs.slice().filter(input => input.score == '');
+            return checked.length ? true : false;
+        },
         addRow() {
             let vm = this;
             this.form.inputs.push({
@@ -386,18 +410,23 @@ export default {
             }
         },
         async updateScore () {
-            const { data } = await this.form.patch(`/api/teacher/performanceScore/update`)
-            this.list = data;
-            this.getPerformanceList(this.activeLessonPlan)
+            if(!this.checkValidation()){
+                const { data } = await this.form.patch(`/api/teacher/performanceScore/update`)
+                this.list = data;
+                this.getPerformanceList(this.activeLessonPlan)
+            }
         },
         async createPlan () {
             const { data } = await this.form.post(`/api/teacher/lesson-plans/create`)
             this.list = data;
         },
         async createPerformance () {
-            const { data } = await this.form.post(`/api/teacher/performance/create`)
-            this.list = data;
-            this.getPerformanceList(this.activeLessonPlan)
+            if(!this.checkValidation()){
+                const { data } = await this.form.post(`/api/teacher/performance/create`)
+                this.list = data;
+                this.getPerformanceList(this.activeLessonPlan)
+
+            }
         },
         getList() {
             let vm = this;

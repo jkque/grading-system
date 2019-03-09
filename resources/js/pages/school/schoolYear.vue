@@ -152,6 +152,7 @@ export default {
                 useCurrent: false,
                 showClear: true,
                 showClose: true,
+                minDate: moment().format('YYYY-MM-DD')
             },
             modalInfo: { title: '', content: '' },
             fields: [

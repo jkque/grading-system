@@ -62,6 +62,15 @@
                         </div>
                     </div>
 
+                    <!-- Middle Name -->
+                    <div class="form-group row">
+                        <label class="col-md-3 col-form-label text-md-right">Middle Name</label>
+                        <div class="col-md-7">
+                        <input v-model="form.middle_name" :class="{ 'is-invalid': form.errors.has('middle_name') }" class="form-control" type="text" name="middle_name">
+                        <has-error :form="form" field="middle_name"/>
+                        </div>
+                    </div>
+
                     <!-- Last Name -->
                     <div class="form-group row">
                         <label class="col-md-3 col-form-label text-md-right">Last Name</label>
@@ -168,6 +177,15 @@
                 <div class="col-md-7">
                 <input v-model="form.first_name" :class="{ 'is-invalid': form.errors.has('first_name') }" class="form-control" type="text" name="first_name">
                 <has-error :form="form" field="first_name"/>
+                </div>
+            </div>
+
+            <!-- Middle Name -->
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label text-md-right">Middle Name</label>
+                <div class="col-md-7">
+                <input v-model="form.middle_name" :class="{ 'is-invalid': form.errors.has('middle_name') }" class="form-control" type="text" name="middle_name">
+                <has-error :form="form" field="middle_name"/>
                 </div>
             </div>
 
@@ -415,6 +433,7 @@ export default {
             this.form.id = item.id;
             this.form.first_name = item.first_name;
             this.form.last_name = item.last_name;
+            this.form.middle_name = item.middle_name;
             this.form.address = item.address;
             this.form.birthdate = moment(item.birthdate).format('YYYY-MM-DD');
             this.form.grade_level_id = this.getGradelevel(item) ? this.getGradelevel(item).id : null;

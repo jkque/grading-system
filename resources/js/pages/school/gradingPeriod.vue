@@ -3,9 +3,6 @@
     <div class="animated fadeIn">
         <b-card header="Grading Period">
             <b-table striped hover :items="school.grading_periods" :fields="fields" :fixed="true" :sort-by.sync="sortBy">
-                <template slot="level" slot-scope="data">
-                    {{ data.item.level }}
-                </template>
                 <template slot="name" slot-scope="data">
                     {{ data.item.name }}
                 </template>
@@ -94,10 +91,6 @@ export default {
             sortBy: 'level',
             modalInfo: { title: '', content: '' },
             fields: [
-                {
-                    key: 'level',
-                    sortable: true
-                },
                 {
                     key: 'name',
                     sortable: true

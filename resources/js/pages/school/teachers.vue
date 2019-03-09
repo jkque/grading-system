@@ -60,6 +60,15 @@
                         </div>
                     </div>
 
+                    <!-- Middle Name -->
+                    <div class="form-group row">
+                        <label class="col-md-3 col-form-label text-md-right">Middle Name</label>
+                        <div class="col-md-7">
+                        <input v-model="form.middle_name" :class="{ 'is-invalid': form.errors.has('middle_name') }" class="form-control" type="text" name="middle_name">
+                        <has-error :form="form" field="middle_name"/>
+                        </div>
+                    </div>
+
                     <!-- Last Name -->
                     <div class="form-group row">
                         <label class="col-md-3 col-form-label text-md-right">Last Name</label>
@@ -193,6 +202,15 @@
                 </div>
             </div>
 
+            <!-- Middle Name -->
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label text-md-right">Middle Name</label>
+                <div class="col-md-7">
+                <input v-model="form.middle_name" :class="{ 'is-invalid': form.errors.has('middle_name') }" class="form-control" type="text" name="middle_name">
+                <has-error :form="form" field="middle_name"/>
+                </div>
+            </div>
+
             <!-- Last Name -->
             <div class="form-group row">
                 <label class="col-md-3 col-form-label text-md-right">Last Name</label>
@@ -310,6 +328,7 @@ export default {
             form: new Form({
                 first_name: '',
                 last_name: '',
+                middle_name: '',
                 mobile_number: '',
                 email: '',
                 password: null,
@@ -390,6 +409,7 @@ export default {
             this.modalInfo.title = item.name;
             this.form.id = item.id;
             this.form.first_name = item.first_name;
+            this.form.middle_name = item.middle_name;
             this.form.last_name = item.last_name;
             this.form.mobile_number = item.mobile_number;
             this.form.email = item.email;

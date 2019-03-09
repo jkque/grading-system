@@ -97,8 +97,9 @@ export default {
     datePickerOptions: {
       format: 'YYYY-MM-DD',
       useCurrent: false,
-      showClear: true,
+      showClear: true,  
       showClose: true,
+      minDate: moment().format('YYYY-MM-DD')
     }
   }),
 

@@ -42,6 +42,7 @@ class TeacherController extends Controller
         $user =  User::create([
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
+            'middle_name' => $request->middle_name,
             'mobile_number' => $data['mobile_number'],
             'address' => $data['address'],
             'email' => $data['email'],
@@ -97,7 +98,7 @@ class TeacherController extends Controller
             ]);
         }
 
-        tap($user)->update($request->only('first_name', 'last_name', 'mobile_number', 'address', 'email','birthdate'));
+        tap($user)->update($request->only('first_name', 'last_name', 'mobile_number', 'address', 'email','birthdate','middle_name'));
 
         $user->update([
             'password' => bcrypt($request->password),
@@ -105,12 +106,13 @@ class TeacherController extends Controller
 
         if($request->grade_level_id && $request->section_id){
             $section = Section::whereId($request->section_id)->first();
-            if($section->gradeLevel->id == $request->grade_level_id && $section->adviser->id != $user->id){
-                $errors = new \stdClass;
-                $errors->grade_level_id = ["The grade level and section is already taken by other teacher."];
-                $errors->section_id = ["The grade level and section is already taken by other teacher."];
-                return response(['errors' => $errors, 'message' => 'The given data was invalid.'],422);
-
+            if($section->adviser){
+                if($section->gradeLevel->id == $request->grade_level_id && $section->adviser->id != $user->id){
+                    $errors = new \stdClass;
+                    $errors->grade_level_id = ["The grade level and section is already taken by other teacher."];
+                    $errors->section_id = ["The grade level and section is already taken by other teacher."];
+                    return response(['errors' => $errors, 'message' => 'The given data was invalid.'],422);
+                }
             }
         }
         
@@ -134,7 +136,7 @@ class TeacherController extends Controller
     public function import(Request $request)
     {
         HandleImportTeacher::dispatch((object)$request->all());
-        return response('Import has been processed in the background',202);
+        return response('Import has been processed in the background. Refresh to update',202);
     }
 
     /**
@@ -328,6 +330,13 @@ class TeacherController extends Controller
             'name' => 'required',
             'percentage' => 'required',
         ]);
+        $checked = Performance::whereLessonPlanId($performance->lesson_plan_id)->where('id','!=',$performance->id)->get()->sum('percentage')+($data['percentage']/100);
+        if($checked > 1){
+            $errors = new \stdClass;
+            $errors->percentage = ["The total percentage is over 100%."];
+            return response(['errors' => $errors, 'message' => 'The given data was invalid.'],422);
+
+        }
         $performance->name = $request->name;
         $performance->percentage = $request->percentage/100;
         $performance->save();
@@ -353,7 +362,13 @@ class TeacherController extends Controller
             'name' => 'required',
             'percentage' => 'required',
         ]);
+        $checked = Performance::whereLessonPlanId($request->lesson_plan_id)->get()->sum('percentage')+($data['percentage']/100);
+        if($checked > 1){
+            $errors = new \stdClass;
+            $errors->percentage = ["The total percentage is over 100%."];
+            return response(['errors' => $errors, 'message' => 'The given data was invalid.'],422);
 
+        }
         $perf = Performance::create([
             'name' => $data['name'],
             'percentage' => $data['percentage']/100,

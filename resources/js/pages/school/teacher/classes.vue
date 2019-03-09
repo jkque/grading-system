@@ -149,7 +149,7 @@
                             <b-col>{{student.name}}</b-col>
                             <template  v-for="(grade, index) in student.grades" >
                                 <b-col :key="'score-'+index">
-                                    <b>{{Math.round(grade.score)}}</b>
+                                    <b :style="{color: Math.round(grade.score) >= school.passing_rate ? 'black' : 'red'}">{{Math.round(grade.score)}}</b>
                                 </b-col>
                                 <b-col :key="'comment-'+index">
                                     <b-form-textarea placeholder="Enter something" :rows="2" :max-rows="6" v-model="grade.comment"> </b-form-textarea>
@@ -318,6 +318,7 @@ export default {
     methods:{
         info (item, index, button) {
             this.form.clear();
+            this.form.reset();
             this.modalInfo.title = 'Add Class Record';
             this.form.id = item.id; 
             this.form.grading_period_id = this.getActiveGP().id;
