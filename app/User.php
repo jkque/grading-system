@@ -99,7 +99,11 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getNameAttribute()
     {
-        return ucwords($this->first_name).' '.ucfirst($this->middle_name[0]).' '.ucfirst($this->last_name);
+        if($this->middle_name){
+            return ucfirst($this->last_name).', '.ucwords($this->first_name).' '.ucfirst($this->middle_name[0]).'.';
+        }else{
+            return ucfirst($this->last_name).', '.ucwords($this->first_name);
+        }
     }
 
     /**
