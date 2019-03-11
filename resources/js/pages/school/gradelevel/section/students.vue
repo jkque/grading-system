@@ -336,6 +336,7 @@ export default {
             const { data } = await this.form.post(`/api/school/grade-level/section/${this.section_id}/student/create`)
             this.list = data;
             this.getStudents(this.list);
+            this.form.reset();
         },
         getList() {
             let vm = this;

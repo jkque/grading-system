@@ -386,6 +386,7 @@ export default {
         async create () {
             const { data } = await this.form.post(`/api/school/grade-level/${this.grade_level_id}/student/create`)
             this.list = data;
+            this.form.reset();
         },
         getList() {
             let vm = this;

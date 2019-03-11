@@ -91,7 +91,7 @@
 
                     <!-- Birthdate -->
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label text-md-right">Birrthdate</label>
+                        <label class="col-md-3 col-form-label text-md-right">Birthdate</label>
                         <div class="col-md-7">
                         <datePicker name="birthdate" v-model="form.birthdate" :class="{ 'is-invalid': form.errors.has('birthdate') }" :config="datePickerOptions"></datePicker>
                         <has-error :form="form" field="birthdate"/>
@@ -519,6 +519,7 @@ export default {
             const { data } = await this.form.post(`/api/school/${this.school_id}/student/create`)
             this.list = data;
             this.getStudents(this.list);
+            this.form.reset();
         },
         getStudents(students) {
             let vm = this;
